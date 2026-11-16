@@ -1418,7 +1418,7 @@ async function exportExcel(){
           else if(fr&&fr.t==='photo'){const dd=await dims(fr.src);placeImg(ws,addImg(fr.src),dd.w,dd.h,b+sl.r0,sl.c0,b+sl.r0+15,sl.c1,6)}
           else if(fr&&fr.t==='none'){ws.mergeCells(R(sl.r0+7),sl.c0+1,R(sl.r0+7),sl.c1);setCell(ws,R(sl.r0+7),sl.c0+1,'— ไม่มีรูปถ่าย —',{size:14,color:{argb:'FF9E9E9E'}},'center')}
         }
-        for(const t of pageTextRows(pg)){ws.mergeCells(R(t.row),t.c0+1,R(t.row),t.c1);setCell(ws,R(t.row),t.c0+1,t.text,{size:14},'left',true)}
+        for(const t of pageTextRows(pg)){ws.mergeCells(R(t.row),t.c0+1,R(t.row),t.c1);const cap=(t.c1-t.c0)*11;const L=String(t.text).length;setCell(ws,R(t.row),t.c0+1,t.text,{size:L>cap*1.6?11:L>cap?12:13},'left',true)}
         for(const sl of slots)box(ws,R(sl.r0),sl.c0+1,R(sl.r0+14),sl.c1,'medium');
       }
       box(ws,R(0),1,R(ROWS-1),NC,'medium');
@@ -1535,8 +1535,10 @@ async function drawReportPage(pg,i,N,pts){
       else if(fr&&fr.t==='photo'){const im=await loadImg(fr.src);fitDraw(x,im,im.naturalWidth,im.naturalHeight,x0,y0,x1,y1,8)}
       else if(fr&&fr.t==='none')txt('— ไม่มีรูปถ่าย —',x0,y0,x1,y1,36,false,'center','#9e9e9e');
       box(x0,y0,x1,y1,3)}
-    for(const t of pageTextRows(pg)){x.font=`400 31px ${RFONT}`;x.fillStyle='#000';x.textAlign='left';x.textBaseline='top';
-      wrapLines(x,t.text,X(t.c1)-X(t.c0)-16,2).forEach((l,j)=>x.fillText(l,X(t.c0)+8,Y(t.row)+8+j*33))}
+    for(const t of pageTextRows(pg)){const w=X(t.c1)-X(t.c0)-16,h=Y(t.row+1)-Y(t.row);let fs=26,lines;
+      for(;fs>=17;fs--){x.font=`400 ${fs}px ${RFONT}`;lines=wrapLines(x,t.text,w,99);if(lines.length<=2)break}
+      x.font=`400 ${fs}px ${RFONT}`;lines=wrapLines(x,t.text,w,2);const lh=fs*1.12,y0=Y(t.row)+Math.max(2,(h-lh*lines.length)/2);
+      x.fillStyle='#000';x.textAlign='left';x.textBaseline='top';lines.forEach((l,j)=>x.fillText(l,X(t.c0)+8,y0+j*lh))}
   }
   // outer double border
   box(X(0),Y(0),X(12),Y(38),3);box(X(0)-6,Y(0)-6,X(12)+6,Y(38)+6,1.2);
@@ -1904,6 +1906,7 @@ async function runInstallCheck(el){
   h+=ok(!IN_APP,IN_APP?'กำลังเปิดในเบราว์เซอร์ของ LINE/แอปอื่น → ต้องเปิดใน Chrome':'เปิดในเบราว์เซอร์ปกติ');
   let man=false;try{const l=document.querySelector('link[rel=manifest]');if(l){const r=await fetch(l.href,{cache:'no-store'});man=r.ok&&!!(await r.json()).name}}catch(e){}
   h+=ok(man,'ไฟล์ manifest.webmanifest อยู่ใน repo');
+  for(const f of['icon-192.png','icon-512.png','icon-maskable-512.png','sw.js']){let o=false;try{const r=await fetch(f,{cache:'no-store'});o=r.ok&&!/text\/html/.test(r.headers.get('content-type')||'')}catch(e){}h+=ok(o,'ไฟล์ '+f+(o?'':' — ไม่พบ ต้องอัปโหลดขึ้น GitHub'))}
   let sw=false;try{sw=!!(navigator.serviceWorker&&await navigator.serviceWorker.getRegistration())}catch(e){}
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
