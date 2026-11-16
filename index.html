@@ -326,6 +326,40 @@ aside.card{border-radius:20px}
 body.dev-mobile #bList{display:inline-block}
 body.dev-mobile header .nav{border:none;background:none;padding:0}
 #hires{position:absolute;pointer-events:none;display:none;background:#fff}
+body.hide-scale #toolcard{display:none}
+aside.card{overflow-y:auto}
+aside .list{min-height:180px}
+.sec-h{white-space:nowrap}
+.sec-h .sum{font-size:12.5px;white-space:nowrap}
+body.dev-tablet aside.card{width:330px}
+body.dev-tablet .sec-h{padding:10px 12px;font-size:15px}
+body.dev-tablet aside .exph{display:none}
+body.dev-tablet aside .exp{padding:8px 10px;gap:6px;border-top:1px solid #ecece6}
+body.dev-tablet aside .exp .btn.pri,body.dev-tablet #bPdf{padding:8px 10px!important}
+body.dev-mobile aside .exph{display:none}
+.stepper{display:inline-flex;align-items:center;border:1px solid #dcdcd5;border-radius:999px;background:#fff;overflow:hidden}
+.stepper button{width:34px;height:34px;border:none;background:#f2f2ee;font-size:18px;font-weight:700;cursor:pointer;color:#121212}
+.stepper button:active{background:#121212;color:#fff}
+.stepper input.n{border:none;border-radius:0;width:64px;text-align:center;font-weight:700;padding:6px 2px;-moz-appearance:textfield}
+.stepper input.n::-webkit-outer-spin-button,.stepper input.n::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+body.dev-tablet .stepper button,body.dev-mobile .stepper button{width:42px;height:40px}
+.pin{transform:translate(-50%,-100%) scale(calc(var(--inv,1) * var(--ps,1)))}
+body.focus header.hdr,body.focus #toolcard,body.focus #iabBar,body.focus aside{display:none!important}
+body.focus .app{padding:0;gap:0}
+body.focus .stagecard{border-radius:0;border:none}
+body.focus .statusbar .hint{display:none}
+body.focus .stagecard .tabs{padding:4px 8px}
+body.dev-tablet .statusbar{padding:3px 10px}
+body.dev-tablet header.hdr{padding:6px 10px}
+body.dev-tablet header .nav .btn{padding:6px 10px;font-size:14px}
+#gbCollapse{display:none}
+body.focus #gbCollapse{display:inline-flex}
+body.mini #gbar,body.mini .stagecard .tabs,body.mini .statusbar{display:none!important}
+#focusPill{display:none;position:absolute;top:10px;right:22px;z-index:8;gap:4px;background:#121212;border-radius:999px;padding:4px;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+body.mini #focusPill{display:flex}
+#focusPill button{border:none;background:transparent;color:#fff;font-family:inherit;font-weight:600;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer}
+#focusPill button:hover{background:#2a2a2a}
+body.mini #subbar{top:10px}
 </style>
 </head>
 <body>
@@ -345,7 +379,7 @@ body.dev-mobile header .nav{border:none;background:none;padding:0}
   <div class="grp"><div class="gl">สเกล &amp; หน่วย</div><div class="gi">
    <span class="lbl">กระดาษ</span><select class="in" id="scPaper" style="width:auto"></select>
    <select class="in" id="scOrient" style="width:auto"><option value="auto">อัตโนมัติ</option><option value="land">แนวนอน</option><option value="port">แนวตั้ง</option></select>
-   <span class="lbl">มาตราส่วน 1 :</span><input class="n" id="scN" type="number" min="1" value="100">
+   <span class="lbl">มาตราส่วน 1 :</span><div class="stepper"><button type="button" id="scMinus" title="−50">−</button><input class="n" id="scN" type="number" min="1" step="50" value="100" list="scList"><button type="button" id="scPlus" title="+50">+</button></div><datalist id="scList"><option value="20"><option value="25"><option value="50"><option value="75"><option value="100"><option value="150"><option value="200"><option value="250"><option value="300"><option value="400"><option value="500"><option value="1000"></datalist>
    <label class="lbl"><input type="checkbox" id="scAll"> ทุกแผ่น</label>
    <button class="btn sm pri" id="scApply">ใช้สเกลกระดาษ</button>
    <button class="btn sm" id="scCal">Calibrate Scale</button>
@@ -374,6 +408,9 @@ body.dev-mobile header .nav{border:none;background:none;padding:0}
      <span class="gsep"></span>
      <button class="gb" id="zOut" title="ซูมออก"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M8 11h6M16 16l4.5 4.5"/></svg></button><span class="zl" id="zLbl">100%</span><button class="gb" id="zIn" title="ซูมเข้า"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="6.5"/><path d="M11 8v6M8 11h6M16 16l4.5 4.5"/></svg></button><button class="gb" id="zFit" title="พอดีจอ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
      <span class="gsep"></span>
+     <button class="gb" id="gbCollapse" title="พับแถบเครื่องมือ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
+     <button class="gb" id="gbFocus" title="โหมดเต็มจอ (F)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
+     <button class="gb" id="gbScale" title="สเกล &amp; หน่วย"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21H3z"/><path d="M7 13l1.5 1.5M10 10l1.5 1.5M13 7l1.5 1.5"/></svg></button>
      <button class="gb" id="gbSub" title="แสดง / ซ่อนแถบย่อย"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h11M4 18h6"/><circle cx="18" cy="12" r="1.5"/><circle cx="13" cy="18" r="1.5"/></svg></button>
     </div>
    </div>
@@ -390,6 +427,7 @@ body.dev-mobile header .nav{border:none;background:none;padding:0}
      <div class="sbs" data-for="pen shape text measure area"><div class="sw" id="swatches"></div><label class="cc" id="ccLbl" title="เลือกสีเอง"><input type="color" id="ccIn" value="#e53935"><span>+</span></label></div>
      <div class="sbs" data-for="eraser"><span class="lbl">แตะหรือลากผ่านเส้นเพื่อลบ</span><button class="btn sm red" id="eraseAll">ลบ Markup ทั้งแผ่น</button></div>
     </div>
+    <div id="focusPill"><button id="fpOpen" title="กางแถบเครื่องมือ">⌄ เครื่องมือ</button><button id="fpExit" title="ออกจากเต็มจอ">⤡</button></div>
     <div id="loupe" hidden><canvas width="150" height="150"></canvas></div>
     <div id="polyBar" class="pbar" hidden><span id="pbTxt"></span><button class="ok" id="pbOk">✓ เสร็จ</button><button id="pbX">✕ ยกเลิก</button></div>
     <div class="sb v" id="sbV"><div class="th"></div></div><div class="sb h" id="sbH"><div class="th"></div></div>
@@ -408,7 +446,7 @@ body.dev-mobile header .nav{border:none;background:none;padding:0}
     <label class="lbl"><input type="checkbox" id="fCur"> เฉพาะแบบนี้</label>
    </div>
    <div class="list" id="list"></div>
-   <div class="sec-h">⬇ Export รายงาน</div>
+   <div class="sec-h exph">⬇ Export รายงาน</div>
    <div class="exp">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px"><button class="btn pri" id="bExcel" style="padding:10px;background:#1d6f42;border-color:#1d6f42">⬇ Excel Report</button><button class="btn pri" id="bPdf" style="padding:10px;background:#b71c1c;border-color:#b71c1c">⬇ PDF Report</button></div>
     <button class="btn" id="bPdfDwg" hidden></button><button class="btn" id="bPng" hidden></button>
@@ -433,7 +471,7 @@ const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const PINC='#e53935';
 const STATUS={'Open':{c:'#e53935',bg:'#fdecea'},'In progress':{c:'#f08c00',bg:'#fff3e0'},'Closed':{c:'#2e7d32',bg:'#e8f5e9'}};
-const SYSTEMS=['HVAC','Electrical','Sanitary','Fire Protection','Building Envelope','Civil / Structure','Architecture','Other'];
+const SYSTEMS=['Air Condition','Duct Work','Steam System','Electrical','Sanitary','Fire Protection','Building Envelope','Civil / Structure','Architecture','Other'];
 
 /* ---------- lazy libraries (load only when needed) ---------- */
 const LIBS={pdf:['https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.min.js','https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/legacy/build/pdf.worker.min.js'],
@@ -554,7 +592,7 @@ function renderExpInfo(){
 function renderAll(){renderProjSel();renderTabs();renderStage();renderList();renderExpInfo()}
 
 /* ---------- view transform ---------- */
-function applyT(){scheduleHires();const w=$('#world');w.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;w.style.setProperty('--inv',1/zoom);$('#zLbl').textContent=Math.round(zoom*100)+'%';updateSB()}
+function applyT(){scheduleHires();const w=$('#world');w.style.transform=`translate(${panX}px,${panY}px) scale(${zoom})`;w.style.setProperty('--inv',1/zoom);w.style.setProperty('--ps',Math.max(.45,Math.min(1,zoom*2.5)));$('#zLbl').textContent=Math.round(zoom*100)+'%';updateSB()}
 function fit(){const d=curDwg();if(!d)return;const s=$('#stage');const sw=s.clientWidth,sh=s.clientHeight;zoom=Math.min((sw-40)/d.w,(sh-40)/d.h);if(!(zoom>0))zoom=.2;panX=(sw-d.w*zoom)/2;panY=(sh-d.h*zoom)/2;applyT()}
 function zoomAt(cx,cy,nz){const r=$('#stage').getBoundingClientRect();const mx=cx-r.left,my=cy-r.top;const ix=(mx-panX)/zoom,iy=(my-panY)/zoom;zoom=Math.min(8,Math.max(.02,nz));panX=mx-ix*zoom;panY=my-iy*zoom;applyT()}
 function zoomCenter(f){const r=$('#stage').getBoundingClientRect();zoomAt(r.left+r.width/2,r.top+r.height/2,zoom*f)}
@@ -781,7 +819,7 @@ function constrain(a,q,type,shift){
 }
 function eraseAt(cx,cy,dr){const el=document.elementFromPoint(cx,cy);const mk=el&&el.closest&&el.closest('[data-mid]');if(mk){if(!dr.undo){pushUndo();dr.undo=true}P.marks=P.marks.filter(m=>m.id!==mk.dataset.mid);renderMarks()}}
 stage.addEventListener('pointerdown',e=>{
-  const d=curDwg();if(!d||e.target.closest('#empty,#polyBar,#subbar,#loupe'))return;
+  const d=curDwg();if(!d||e.target.closest('#empty,#polyBar,#subbar,#loupe,#focusPill'))return;
   if(e.pointerType==='pen'&&!penSeen){penSeen=true;setMode(mode)}
   if(e.button===2)return;
   e.preventDefault();
@@ -915,7 +953,7 @@ function updateSB(){
 /* ---------- points ---------- */
 function addPoint(x,y){
   pushUndo();
-  const p={id:uid(),no:nextNo(),drawingId:P.active,x,y,location:'',system:'HVAC',desc:'',action:'',status:'Open',inspector:P.header.inspector||'',date:today(),photos:pendingPhotos||[]};pendingPhotos=null;
+  const p={id:uid(),no:nextNo(),drawingId:P.active,x,y,location:'',system:(P.points.length?ptsSorted()[P.points.length-1].system:'Air Condition')||'Air Condition',desc:'',action:'',status:'Open',inspector:P.header.inspector||'',date:today(),photos:pendingPhotos||[]};pendingPhotos=null;
   P.points.push(p);selId=p.id;save();renderPins();renderList();renderTabs();openPoint(p.id,true);
 }
 async function deletePoint(id){
@@ -930,7 +968,7 @@ function openPoint(id,isNew=false){
   modal(`<div class="mh"><span class="no" style="background:${s.c}">${esc(p.no)}</span> Point ${esc(p.no)} <span class="sp"></span><span class="muted" style="font-weight:400">${esc((P.drawings.find(d=>d.id===p.drawingId)||{}).name||'')}</span></div>
   <div class="mb">
     <div class="f"><label>Point No.</label><input class="in" id="pNo" type="number" min="1" value="${esc(p.no)}"></div>
-    <div class="f"><label>ระบบงาน</label><select class="in" id="pSys">${SYSTEMS.map(x=>`<option ${x===p.system?'selected':''}>${x}</option>`).join('')}</select></div>
+    <div class="f"><label>ระบบงาน</label><select class="in" id="pSys">${(SYSTEMS.includes(p.system)||!p.system?SYSTEMS:[p.system,...SYSTEMS]).map(x=>`<option ${x===p.system?'selected':''}>${x}</option>`).join('')}</select></div>
     <div class="f full"><label>ตำแหน่ง / Location</label><input class="in" id="pLoc" value="${esc(p.location)}" placeholder="เช่น ชั้น 3 Grid C-4 ท่อลม Supply หน้าห้อง 301"></div>
     <div class="f full"><label>รายละเอียดปัญหา / Description</label><textarea class="in" id="pDesc" rows="3" placeholder="อธิบายสิ่งที่พบหน้างาน">${esc(p.desc)}</textarea></div>
     <div class="f full"><label>การแก้ไข / หมายเหตุ (Action / Remark)</label><textarea class="in" id="pAct" rows="2">${esc(p.action)}</textarea></div>
@@ -1536,6 +1574,9 @@ const EN={
 'แสดง Markup':'Show markup',
 'ซ่อน Markup':'Hide markup',
 'วัดระยะ (M)':'Measure (M)',
+'⌄ เครื่องมือ':'⌄ Tools','พับแถบเครื่องมือ':'Collapse toolbar','กางแถบเครื่องมือ':'Show toolbar','ออกจากเต็มจอ':'Exit full screen',
+'โหมดเต็มจอ (F)':'Focus mode (F)',
+'สเกล & หน่วย':'Scale & unit',
 '＋ โครงการใหม่':'＋ New project',
 'แตะหรือลากผ่านเส้นเพื่อลบ':'Tap or drag over lines to erase','ลบ Markup ทั้งแผ่น':'Erase all on sheet','ลากเพื่อย้ายแถบ':'Drag to move',
 '🧲 จับเส้น':'🧲 Snap','จับเส้น: เปิด — จุดวัดจะดูดเข้าเส้นดำ':'Snap on — points stick to drawing lines','จับเส้น: ปิด':'Snap off',
@@ -1630,7 +1671,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-2010V · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-2060C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
@@ -1688,6 +1729,17 @@ async function createProject(){
 /* ---------- wiring ---------- */
 document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{if(b.classList.contains('gb')&&mode===b.dataset.mode&&modeGroup(mode)){subOpen=!subOpen;renderSubbar(modeGroup(mode));return}setMode(b.dataset.mode)});
 document.querySelectorAll('#gbar [data-grp]').forEach(b=>b.onclick=()=>{const g=b.dataset.grp;if(modeGroup(mode)===g){subOpen=!subOpen;renderSubbar(g);return}subOpen=true;setMode(g==='pen'?lastPen:lastShape)});
+function applyScalePanel(){let v=null;try{v=localStorage.getItem('drawnote-scale-panel')}catch(e){}const show=v===null?resolveDevice()==='desktop':v==='1';document.body.classList.toggle('hide-scale',!show);$('#gbScale').classList.toggle('on',show);if(curDwg())requestAnimationFrame(()=>applyT())}
+function setFocus(on){document.body.classList.toggle('focus',on);if(!on)document.body.classList.remove('mini');$('#gbFocus').classList.toggle('on',on);
+  try{if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});else if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
+  setTimeout(()=>{if(curDwg())applyT()},80)}
+$('#gbFocus').onclick=()=>setFocus(!document.body.classList.contains('focus'));
+const setMini=on=>{document.body.classList.toggle('mini',on);setTimeout(()=>{if(curDwg())applyT()},60)};
+$('#gbCollapse').onclick=()=>{if(!document.body.classList.contains('focus'))setFocus(true);setMini(true)};
+$('#fpOpen').onclick=()=>setMini(false);$('#fpExit').onclick=()=>{setMini(false);setFocus(false)};
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.body.classList.contains('focus')){document.body.classList.remove('focus','mini');$('#gbFocus').classList.remove('on');setTimeout(()=>{if(curDwg())applyT()},80)}});
+document.addEventListener('keydown',e=>{if(e.key==='f'&&!e.ctrlKey&&!e.metaKey&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)&&!document.querySelector('.modal-bg'))setFocus(!document.body.classList.contains('focus'))});
+$('#gbScale').onclick=()=>{const show=document.body.classList.contains('hide-scale');try{localStorage.setItem('drawnote-scale-panel',show?'1':'0')}catch(e){}applyScalePanel()};
 $('#gbSub').onclick=()=>{subOpen=!subOpen;renderSubbar(modeGroup(mode));if(subOpen&&!modeGroup(mode))toast('เลือกปากกา / รูปทรง / วัดระยะ ก่อน แถบย่อยจะแสดงตัวเลือก')};
 $('#ccIn').oninput=e=>{curColor=e.target.value;renderSwatches();if(selMark){const m=P.marks.find(x=>x.id===selMark);if(m){m.color=curColor;save();renderMarks()}}};
 $('#eraseAll').onclick=async()=>{const d=curDwg();if(!d)return;const n=P.marks.filter(m=>m.drawingId===d.id).length;if(!n){toast('แผ่นนี้ไม่มี Markup');return}
@@ -1707,7 +1759,9 @@ $('#sizes').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;curSiz
   if(selMark){const m=P.marks.find(x=>x.id===selMark);if(m){pushUndo();m.size=curSize;save();renderMarks()}}};
 $('#bEye').onclick=()=>{showMarks=!showMarks;$('#bEye').classList.toggle('on',!showMarks);toast(showMarks?'แสดง Markup':'ซ่อน Markup');renderMarks()};
 $('#unitSeg').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;P.opts.unit=b.dataset.u;save();renderScaleCtl();renderMarks();if(poly)drawPoly()};
-$('#scApply').onclick=applyPaperScale;$('#scN').onkeydown=e=>{if(e.key==='Enter')applyPaperScale()};
+$('#scApply').onclick=applyPaperScale;
+const stepScale=dir=>{const i=$('#scN');let v=parseFloat(i.value)||100;v=dir>0?(v<50?50:Math.floor(v/50)*50+50):(v<=50?Math.max(10,v-10):Math.ceil(v/50)*50-50);i.value=v;applyPaperScale()};
+$('#scMinus').onclick=()=>stepScale(-1);$('#scPlus').onclick=()=>stepScale(1);$('#scN').onkeydown=e=>{if(e.key==='Enter')applyPaperScale()};
 $('#scCal').onclick=()=>{setMode('calib');toast('ลากเส้นทับระยะที่รู้ค่าจริงบนแบบ',3500)};
 $('#measSeg').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;if(poly)cancelPoly();P.opts.measMode=b.dataset.m;save();renderMeasSeg();toast(b.dataset.m==='two'?'วัดระยะ: แตะ 2 จุด':'วัดระยะ: ต่อเนื่อง — แตะทีละจุด แล้วกด ✓ เสร็จ')};
 $('#snapBtn').onclick=()=>{snapOn=!snapOn;$('#snapBtn').classList.toggle('on',snapOn);toast(snapOn?'จับเส้น: เปิด — จุดวัดจะดูดเข้าเส้นดำ':'จับเส้น: ปิด')};
@@ -1752,7 +1806,7 @@ try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}ca
 if(IN_APP)showIab();$('#bPaste').onclick=pasteFromClipboard;
 $('#langSeg').onclick=e=>{const b=e.target.closest('[data-l]');if(b)setLang(b.dataset.l)};$('#devSel').onchange=e=>setDevice(e.target.value);
 $('#bList').onclick=()=>document.body.classList.toggle('list-open');
-try{DEVICE=localStorage.getItem('drawnote-device')||'auto'}catch(e){}applyDevice();
+try{DEVICE=localStorage.getItem('drawnote-device')||'auto'}catch(e){}applyDevice();applyScalePanel();
 try{const l=localStorage.getItem('drawnote-lang');if(l==='en')setLang('en')}catch(e){}$('#bPdf').onclick=guarded(exportPdfReport);$('#bPdfDwg').onclick=guarded(exportPdfDrawings);
 $('#colSeg').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;P.opts.cols=+b.dataset.c;save();renderExpInfo();toast(P.opts.cols==2?'Report: 2 คอลัมน์ (4 รูป/หน้า)':'Report: 1 คอลัมน์ (2 รูป/หน้า)')};
 window.addEventListener('error',e=>{console.error(e.error||e.message);toast('เกิดข้อผิดพลาด: '+(e.message||'unknown')+' — งานยังถูกบันทึกอยู่',5000)});
