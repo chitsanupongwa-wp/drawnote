@@ -769,8 +769,8 @@ body.dev-mobile aside.card{border-radius:16px 16px 0 0}
   </aside>
  </div>
 </div>
-<input type="file" id="fileDwg" accept=".pdf,image/png,image/jpeg,image/*" multiple hidden>
-<input type="file" id="fileJson" accept=".json,application/json" hidden>
+<input type="file" id="fileDwg" multiple hidden>
+<input type="file" id="fileJson" hidden>
 <div id="toast"></div>
 <div id="busy"><div class="bx"><div class="sp2"></div><span id="busyTxt">กำลังทำงาน…</span></div></div>
 
@@ -1889,7 +1889,7 @@ $('#pbOk').onclick=finishPoly;$('#pbX').onclick=cancelPoly;
 setMode('select');
 $('#zIn').onclick=()=>zoomCenter(1.25);$('#zOut').onclick=()=>zoomCenter(.8);$('#zFit').onclick=fit;
 $('#bUpload').onclick=$('#bUpload2').onclick=()=>$('#fileDwg').click();
-$('#fileDwg').onchange=e=>{const f=[...e.target.files];e.target.value='';importDrawings(f)};
+$('#fileDwg').onchange=e=>{const f=[...e.target.files];e.target.value='';const j=f.filter(isJson);j.forEach(importWorkFile);const d=f.filter(x=>!isJson(x));if(d.length)importDrawings(d)};
 $('#bUndo').onclick=undo;
 const guarded=fn=>async()=>{if(busyOn)return;busy(true);try{await fn()}catch(e){console.error(e);toast('เกิดข้อผิดพลาด: '+(e.message||e),5000)}finally{busy(false)}};
 $('#bExcel').onclick=guarded(exportExcel);
