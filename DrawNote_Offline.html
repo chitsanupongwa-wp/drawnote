@@ -84,6 +84,7 @@ aside{width:350px;border-left:1px solid var(--line);display:flex;flex-direction:
 .ph .del{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:11px;border:none;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;line-height:22px;padding:0}
 .ph .ord{position:absolute;left:4px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border-radius:6px;padding:0 5px}
 .addph{width:96px;height:96px;border:1.5px dashed #b8bec6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--mu);cursor:pointer;font-size:12.5px;text-align:center}
+.addph b{font-size:22px;line-height:1.1;margin-bottom:2px}.addph.cam{border-color:var(--g);color:var(--g)}
 .addph:hover{border-color:var(--g);color:var(--g)}
 .logo-prev{height:54px;border:1px solid var(--line);border-radius:8px;background:#fafafa center/contain no-repeat;flex:1}
 #toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#1f2328;color:#fff;padding:9px 16px;border-radius:10px;font-size:14px;z-index:80;display:none;max-width:90vw}
@@ -353,6 +354,10 @@ body.mini #focusPill{display:flex}
 #focusPill button{border:none;background:transparent;color:#fff;font-family:inherit;font-weight:600;font-size:14px;padding:8px 14px;border-radius:999px;cursor:pointer}
 #focusPill button:hover{background:#2a2a2a}
 body.mini #subbar{top:10px}
+.gb.gbscale,body.dev-tablet .gb.gbscale,body.dev-mobile .gb.gbscale{width:auto;min-width:0;white-space:nowrap;flex:none;padding:0 10px;gap:4px;border:1px solid #dcdcd5;border-radius:999px;background:#fff;font-weight:700;font-size:13px;color:#121212;height:34px}
+.gb.gbscale b{font-size:10px;color:#777}
+.gb.gbscale.on{background:#121212;color:#fff;border-color:#121212}
+.gb.gbscale.on b{color:#bbb}
 </style>
 </head>
 <body>
@@ -403,7 +408,7 @@ body.mini #subbar{top:10px}
      <span class="gsep"></span>
      <button class="gb" id="gbCollapse" title="พับแถบเครื่องมือ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 15l6-6 6 6"/></svg></button>
      <button class="gb" id="gbFocus" title="โหมดเต็มจอ (F)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7"/></svg></button>
-     <button class="gb" id="gbScale" title="สเกล &amp; หน่วย"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L17 3l4 4L7 21H3z"/><path d="M7 13l1.5 1.5M10 10l1.5 1.5M13 7l1.5 1.5"/></svg></button>
+     <button class="gb gbscale" id="gbScale" title="สเกล &amp; หน่วย — แตะเพื่อตั้งค่า"><span id="gbScaleTxt">1:100</span><b>▾</b></button>
      <button class="gb" id="gbSub" title="แสดง / ซ่อนแถบย่อย"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h11M4 18h6"/><circle cx="18" cy="12" r="1.5"/><circle cx="13" cy="18" r="1.5"/></svg></button>
     </div>
    </div>
@@ -732,6 +737,7 @@ function setMode(m){
   if(m!=='select'&&selMark){selMark=null;renderMarks()}
 }
 function renderScaleCtl(){
+  {const d0=curDwg(),t=$('#gbScaleTxt');if(t)t.textContent=!d0?'สเกล':(d0.scale&&d0.scale.mode==='cal'?'CAL':'1:'+((d0.scale&&d0.scale.N)||100))+' · '+(P.opts.unit||'m')}
   $('#unitSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.u===(P.opts.unit||'m')));
   const d=curDwg();const dis=!d;['#scPaper','#scOrient','#scN','#scApply','#scCal','#scAll'].forEach(s=>$(s).disabled=dis);
   if(!d){$('#scInfo').textContent='';return}
@@ -971,10 +977,11 @@ function openPoint(id,isNew=false){
   </div>
   <div class="mf">${isNew?'':'<button class="btn red" id="pDel">ลบ Point</button>'}<span class="sp"></span><button class="btn" data-cancel>ยกเลิก</button><button class="btn pri" id="pSave">บันทึก</button></div>`,(m,close)=>{
     const fin=document.createElement('input');fin.type='file';fin.accept='image/*';fin.multiple=true;
-    const drawPh=()=>{m.querySelector('#phs').innerHTML=photos.map((ph,i)=>`<div class="ph" style="background-image:url(${ph})"><button class="del" data-i="${i}">✕</button><span class="ord">${i+1}</span></div>`).join('')+`<div class="addph" id="addPh">＋<br>เพิ่มรูป / ถ่ายรูป</div>`;
+    const fcam=document.createElement('input');fcam.type='file';fcam.accept='image/*';fcam.setAttribute('capture','environment');fcam.hidden=true;fin.hidden=true;m.appendChild(fin);m.appendChild(fcam);
+    const drawPh=()=>{m.querySelector('#phs').innerHTML=photos.map((ph,i)=>`<div class="ph" style="background-image:url(${ph})"><button class="del" data-i="${i}">✕</button><span class="ord">${i+1}</span></div>`).join('')+`<div class="addph cam" id="camPh"><b>📷</b>ถ่ายรูป</div><div class="addph" id="addPh"><b>🖼</b>เลือกรูป</div>`;
       m.querySelectorAll('.ph .del').forEach(b=>b.onclick=()=>{photos.splice(+b.dataset.i,1);drawPh()});
-      m.querySelector('#addPh').onclick=()=>fin.click();};
-    fin.onchange=async()=>{const fs=[...fin.files];fin.value='';toast('กำลังเตรียมรูป…',0);for(const f of fs){try{photos.push(await compressImage(f,1600,.82))}catch(e){}}toast('เพิ่ม '+fs.length+' รูป');drawPh()};
+      m.querySelector('#addPh').onclick=()=>fin.click();m.querySelector('#camPh').onclick=()=>fcam.click();};
+    fcam.onchange=fin.onchange=async e=>{const inp=e.target,fs=[...inp.files];inp.value='';if(!fs.length)return;toast('กำลังเตรียมรูป…',0);for(const f of fs){try{photos.push(await compressImage(f,1600,.82))}catch(e){}}toast('เพิ่ม '+fs.length+' รูป');drawPh()};
     drawPh();
     addPhotosToOpenPoint=async fs=>{toast('กำลังเตรียมรูป…',0);for(const f of fs){try{photos.push(await compressImage(f,1600,.82))}catch(e){}}toast('วางรูป '+fs.length+' รูป');drawPh()};
     const _close=close;close=()=>{addPhotosToOpenPoint=null;_close()};
@@ -1525,7 +1532,7 @@ const EN={
 'ผู้ตรวจ / Inspector':'Inspector',
 'กำลังเตรียมไฟล์งาน…':'Preparing work file…',
 'การแก้ไข / หมายเหตุ':'Action / Remark',
-'เพิ่มรูป / ถ่ายรูป':'Add / take photo',
+'เพิ่มรูป / ถ่ายรูป':'Add / take photo','ถ่ายรูป':'Camera','เลือกรูป':'Gallery',
 'ยกเลิกการดาวน์โหลด':'Download cancelled',
 'ตำแหน่ง / Location':'Location',
 'ใช้วัดระยะได้ทันที':'ready to measure',
@@ -1664,7 +1671,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-2060C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-2080C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
