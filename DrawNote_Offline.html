@@ -84,6 +84,18 @@ aside{width:350px;border-left:1px solid var(--line);display:flex;flex-direction:
 .ph .del{position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:11px;border:none;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;line-height:22px;padding:0}
 .ph .ord{position:absolute;left:4px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;border-radius:6px;padding:0 5px}
 .addph{width:96px;height:96px;border:1.5px dashed #b8bec6;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;color:var(--mu);cursor:pointer;font-size:12.5px;text-align:center}
+.camov{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center}
+.camov video{width:100%;height:100%;object-fit:contain}
+.camov.flash{background:#fff}.camov.flash video{opacity:.4}
+.camtop{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-between;align-items:center;padding:14px 16px;color:#fff;font-weight:700;font-size:16px;background:linear-gradient(#000a,#0000)}
+.camx{background:#ffffff26;color:#fff;border:1px solid #fff6;border-radius:999px;padding:8px 14px;font-size:14px}
+.cambar{position:absolute;bottom:0;left:0;right:0;display:flex;justify-content:space-around;align-items:center;padding:18px 10px 26px;background:linear-gradient(#0000,#000c)}
+.camb{background:#ffffff26;color:#fff;border:1px solid #fff6;border-radius:999px;padding:12px 20px;font-size:16px;font-weight:700;min-width:96px}
+.camb.ok{background:#16a34a;border-color:#16a34a}
+.camshot{width:76px;height:76px;border-radius:50%;background:#fff;border:6px solid #ffffff80;background-clip:padding-box}
+.camshot:active{transform:scale(.92)}
+.camthumbs{position:absolute;bottom:130px;left:12px;right:12px;display:flex;gap:6px;overflow-x:auto}
+.camthumbs div{flex:none;width:56px;height:56px;border-radius:8px;background-size:cover;background-position:center;border:2px solid #fff}
 .addph b{font-size:22px;line-height:1.1;margin-bottom:2px}.addph.cam{border-color:var(--g);color:var(--g)}
 .addph:hover{border-color:var(--g);color:var(--g)}
 .logo-prev{height:54px;border:1px solid var(--line);border-radius:8px;background:#fafafa center/contain no-repeat;flex:1}
@@ -980,7 +992,7 @@ function openPoint(id,isNew=false){
     const fcam=document.createElement('input');fcam.type='file';fcam.accept='image/*';fcam.setAttribute('capture','environment');fcam.hidden=true;fin.hidden=true;m.appendChild(fin);m.appendChild(fcam);
     const drawPh=()=>{m.querySelector('#phs').innerHTML=photos.map((ph,i)=>`<div class="ph" style="background-image:url(${ph})"><button class="del" data-i="${i}">✕</button><span class="ord">${i+1}</span></div>`).join('')+`<div class="addph cam" id="camPh"><b>📷</b>ถ่ายรูป</div><div class="addph" id="addPh"><b>🖼</b>เลือกรูป</div>`;
       m.querySelectorAll('.ph .del').forEach(b=>b.onclick=()=>{photos.splice(+b.dataset.i,1);drawPh()});
-      m.querySelector('#addPh').onclick=()=>fin.click();m.querySelector('#camPh').onclick=()=>fcam.click();};
+      m.querySelector('#addPh').onclick=()=>fin.click();m.querySelector('#camPh').onclick=()=>openCamera(async urls=>{for(const u of urls)photos.push(u);if(urls.length)toast('เพิ่ม '+urls.length+' รูป');drawPh()},()=>fcam.click());};
     fcam.onchange=fin.onchange=async e=>{const inp=e.target,fs=[...inp.files];inp.value='';if(!fs.length)return;toast('กำลังเตรียมรูป…',0);for(const f of fs){try{photos.push(await compressImage(f,1600,.82))}catch(e){}}toast('เพิ่ม '+fs.length+' รูป');drawPh()};
     drawPh();
     addPhotosToOpenPoint=async fs=>{toast('กำลังเตรียมรูป…',0);for(const f of fs){try{photos.push(await compressImage(f,1600,.82))}catch(e){}}toast('วางรูป '+fs.length+' รูป');drawPh()};
@@ -997,6 +1009,26 @@ function openPoint(id,isNew=false){
   });
 }
 
+
+/* ---------- in-app camera (works even when Android picker has no camera) ---------- */
+async function openCamera(done,fallback){
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia)){fallback();return}
+  let st;try{st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1440}},audio:false})}
+  catch(e){toast('เปิดกล้องไม่ได้ — อนุญาตกล้องให้เว็บนี้ หรือใช้กล้องระบบ');fallback();return}
+  const shots=[];const o=document.createElement('div');o.className='camov';
+  o.innerHTML=`<video playsinline autoplay muted></video><div class="camtop"><span id="camN">0 รูป</span><button class="camx" id="camSys">กล้องระบบ</button></div>
+  <div class="cambar"><button class="camb" id="camCancel">ยกเลิก</button><button class="camshot" id="camShot" aria-label="ถ่าย"></button><button class="camb ok" id="camDone">เสร็จ</button></div><div class="camthumbs" id="camTh"></div>`;
+  document.body.appendChild(o);const v=o.querySelector('video');v.srcObject=st;
+  const stop=()=>{st.getTracks().forEach(t=>t.stop());o.remove()};
+  o.querySelector('#camShot').onclick=()=>{if(!v.videoWidth)return;const W=v.videoWidth,H=v.videoHeight,k=Math.min(1,1600/Math.max(W,H));
+    const c=document.createElement('canvas');c.width=Math.round(W*k);c.height=Math.round(H*k);c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+    const u=c.toDataURL('image/jpeg',.82);shots.push(u);o.querySelector('#camN').textContent=shots.length+' รูป';
+    const t=document.createElement('div');t.style.backgroundImage=`url(${u})`;o.querySelector('#camTh').prepend(t);
+    o.classList.add('flash');setTimeout(()=>o.classList.remove('flash'),120)};
+  o.querySelector('#camDone').onclick=()=>{stop();done(shots)};
+  o.querySelector('#camCancel').onclick=()=>{stop();if(shots.length)done(shots)};
+  o.querySelector('#camSys').onclick=()=>{stop();if(shots.length)done(shots);fallback()};
+}
 /* ---------- image helpers ---------- */
 function fileToDataURL(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)})}
 async function compressImage(file,maxSide,q,fmt='image/jpeg'){
@@ -1671,7 +1703,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-2080C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-2090C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
