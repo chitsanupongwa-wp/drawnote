@@ -680,6 +680,12 @@ header .pref select{background:#fff;color:var(--k);border:1px solid #e3e3dc}
  body.dev-tablet #gbar .gbt:not(.tools){order:1;overflow-x:auto;scrollbar-width:none;flex:1 1 0;min-width:0}
  body.dev-tablet aside.side{width:var(--asw,290px)!important}
 }
+
+.szr{display:flex;align-items:center;gap:6px;padding:0 4px}
+.szr input{width:110px;accent-color:var(--tc)}
+.szr span{min-width:34px;text-align:center;font-weight:800;font-size:13px;background:#121212;color:#fff;border-radius:8px;padding:3px 6px}
+body.dev-tablet .szr input,body.dev-mobile .szr input{width:140px;height:28px}
+.scset th{background:#121212}
 </style>
 </head>
 <body>
@@ -761,7 +767,7 @@ header .pref select{background:#fff;color:var(--k);border:1px solid #e3e3dc}
      <div class="sbs" data-for="takeoff"><div class="seg" id="tkLineSeg"><button data-l="poly">〰 Polyline</button><button data-l="straight">／ เส้นตรง</button></div><button class="btn sm ghost" id="tkOrtho" title="ล็อกแนวนอน/แนวตั้ง">⊾ ตั้งฉาก</button><button class="btn sm" id="tkDropBtn" title="แตะบนเส้นเพื่อวางจุดลงแนวดิ่ง">⭕ จุดแนวดิ่ง</button><span class="lbl" id="tkScaleLbl"></span><button class="btn sm ghost" id="tkCalBtn">📐 ตรวจสเกล</button></div>
      <div class="sbs" data-for="measure"><div class="seg" id="measSeg"><button data-m="two">① 2 จุด</button><button data-m="chain">② ต่อเนื่อง</button></div></div>
      <div class="sbs" data-for="measure area takeoff"><button class="btn sm on" id="snapBtn" title="จุดวัดดูดเข้าเส้นดำบนแบบ">🧲 จับเส้น</button></div>
-     <div class="sbs" data-for="pen shape text measure area takeoff"><div class="seg sz" id="sizes"><button data-s="S" title="บาง"><i style="height:2px"></i></button><button data-s="M" class="on" title="กลาง"><i style="height:4px"></i></button><button data-s="L" title="หนา"><i style="height:7px"></i></button></div></div>
+     <div class="sbs" data-for="pen shape text measure area takeoff"><div class="seg sz" id="sizes"><button data-s="S" title="บาง"><i style="height:2px"></i></button><button data-s="M" class="on" title="กลาง"><i style="height:4px"></i></button><button data-s="L" title="หนา"><i style="height:7px"></i></button></div><div class="szr"><input type="range" id="szR" min="0.5" max="12" step="0.5" value="4" title="ความหนาเส้น"><span id="szV">4</span></div></div>
      <div class="sbs" data-for="pen shape text measure area"><div class="sw" id="swatches"></div><label class="cc" id="ccLbl" title="เลือกสีเอง"><input type="color" id="ccIn" value="#e53935"><span>+</span></label></div>
      <div class="sbs" data-for="eraser"><span class="lbl">แตะหรือลากผ่านเส้นเพื่อลบ</span><button class="btn sm red" id="eraseAll">ลบ Markup ทั้งแผ่น</button></div>
     </div>
@@ -974,6 +980,7 @@ function centerOn(p){const d=P.drawings.find(x=>x.id===p.drawingId);if(!d)return
 
 /* ---------- markups & scale ---------- */
 const SIZES={S:2,M:4,L:8}, SZF={S:1,M:1.4,L:2};
+const szw=sz=>typeof sz==='number'?sz:(SIZES[sz]||4), szf=sz=>typeof sz==='number'?Math.max(.85,Math.min(2.4,.7+sz*.17)):(SZF[sz]||1.4);
 const COLORS=['#fdd835','#00acc1','#e53935','#43a047','#1e88e5','#8e24aa','#212121'];
 const PAPERS={A0:[841,1189],A1:[594,841],A2:[420,594],A3:[297,420],A4:[210,297]};
 const DRAWMODES={pen:'ปากกา',hl:'ไฮไลท์',line:'เส้นตรง',arrow:'ลูกศร',rect:'สี่เหลี่ยม',ellipse:'วงกลม',cloud:'Cloud',text:'ข้อความ'};
@@ -1015,7 +1022,7 @@ function cloudPts(a,b,r){
   return out;
 }
 function prims(m,d){
-  const u=m.u||1,c=m.color,sz=m.size||'M',f=SZF[sz],sw=SIZES[sz]*u,p=m.pts,o=[];
+  const u=m.u||1,c=m.color,sz=m.size||'M',f=szf(sz),sw=szw(sz)*u,p=m.pts,o=[];
   const lbl=(x,y,t,fs,col,anchor='middle')=>o.push({k:'text',x,y,t,fs,fill:col,anchor,bold:1});
   switch(m.type){
     case 'pen':o.push({k:'path',pts:p,smooth:1,stroke:c,w:sw});break;
@@ -1044,7 +1051,7 @@ function prims(m,d){
       if(m.no&&p.length){const t='L'+m.no,tf=fs*1.15,tw=tf*.62*t.length+tf*.8,th=tf*1.5,x0=p[0][0]-tw/2,y0=p[0][1]-th-lw*3;o.push({k:'path',pts:[[x0,y0],[x0+tw,y0],[x0+tw,y0+th],[x0,y0+th]],closed:1,fill:col,stroke:col,w:lw*.5});o.push({k:'path',pts:[[p[0][0],y0+th],[p[0][0],p[0][1]]],stroke:col,w:lw*.8});o.push({k:'text',x:p[0][0],y:y0+th/2,t,fs:tf,fill:'#fff',anchor:'middle',bold:1,nohalo:1})}
       for(let i=0;i<p.length;i++)o.push({k:'ell',cx:p[i][0],cy:p[i][1],rx:lw*1.5,ry:lw*1.5,stroke:col,w:lw*.6,fill:i===0||i===p.length-1?'#fff':col});
       (m.drops||[]).forEach(dp=>{const R=9*u*f;o.push({k:'ell',cx:dp.p[0],cy:dp.p[1],rx:R,ry:R,stroke:col,w:lw*.9,fill:'#fff'});o.push({k:'ell',cx:dp.p[0],cy:dp.p[1],rx:R*.35,ry:R*.35,stroke:col,w:lw*.5,fill:col});if(+dp.len>0)lbl(dp.p[0]+R*1.3,dp.p[1]-R*1.1,'↕ '+fmtM(dp.len),fs*.95,col,'start')});
-      if(p.length>=2){const l=p[p.length-1],t=tkCalc(m,d);lbl(l[0]+fs*.7,l[1]+fs*1.3,(m.no?'L'+m.no+' ':'')+(m.item?m.item+': ':'')+(t?fmtM(t.total):fmtLen(segLen(p),d)),fs*1.1,col,'start')}
+      if(p.length>=1&&(p.length>=2||m.single)){const l=p[p.length-1],t=tkCalc(m,d);lbl(l[0]+fs*.7,l[1]+fs*1.3,(m.no?'L'+m.no+' ':'')+(m.item?m.item+': ':'')+(t?fmtM(t.total):fmtLen(segLen(p),d)),fs*1.1,col,'start')}
       break}
     case 'area':{const lw=Math.max(1.6*u,sw*.5),fs=15*u*f;
       o.push({k:'path',pts:p,closed:p.length>2,stroke:c,w:lw,fill:c,fillOp:.15});
@@ -1086,7 +1093,7 @@ let OVMODE='site';
 function drawMarksCanvas(ctx,d,k,ox,oy){if(OVMODE==='boq'){P.marks.filter(m=>m.drawingId===d.id&&m.type==='takeoff').forEach(m=>drawPrims(ctx,prims(m,d),k,ox,oy));return}if(P.opts.exportMarks===false)return;P.marks.filter(m=>m.drawingId===d.id&&m.type!=='takeoff').forEach(m=>drawPrims(ctx,prims(m,d),k,ox,oy))}
 function markBBox(m){
   let xs=m.pts.map(p=>p[0]),ys=m.pts.map(p=>p[1]);
-  if(m.type==='text'){const fs=18*(m.u||1)*SZF[m.size||'M'];xs.push(m.pts[0][0]+String(m.text||'').length*fs*.6);ys.push(m.pts[0][1]-fs*.6,m.pts[0][1]+fs*.6)}
+  if(m.type==='text'){const fs=18*(m.u||1)*szf(m.size||'M');xs.push(m.pts[0][0]+String(m.text||'').length*fs*.6);ys.push(m.pts[0][1]-fs*.6,m.pts[0][1]+fs*.6)}
   const pad=8*(m.u||1);return[Math.min(...xs)-pad,Math.min(...ys)-pad,Math.max(...xs)+pad,Math.max(...ys)+pad];
 }
 function renderMarks(){
@@ -1215,6 +1222,11 @@ function placePolyPoint(pt,shift){
 const ptrs=new Map();let drag=null;
 const stage=$('#stage');
 const toPx=(cx,cy)=>{const r=stage.getBoundingClientRect();return{x:(cx-r.left-panX)/zoom,y:(cy-r.top-panY)/zoom}};
+function smoothStroke(p){if(p.length<5)return p;
+  // remove start hook: drop leading points that move against the main direction within the first few px
+  const k=Math.min(p.length-1,8),dx=p[k][0]-p[0][0],dy=p[k][1]-p[0][1],L=Math.hypot(dx,dy)||1;let s=0;
+  for(let i=1;i<Math.min(6,p.length-2);i++){const vx=p[i][0]-p[0][0],vy=p[i][1]-p[0][1];if((vx*dx+vy*dy)/L<-.5/zoom||Math.hypot(vx,vy)*zoom<2)s=i;else break}
+  let q=p.slice(s);for(let pass=0;pass<2;pass++){const o=[q[0]];for(let i=1;i<q.length-1;i++)o.push([(q[i-1][0]+2*q[i][0]+q[i+1][0])/4,(q[i-1][1]+2*q[i][1]+q[i+1][1])/4]);o.push(q[q.length-1]);q=o}return q}
 function constrain(a,q,type,shift){
   if(!shift)return[q.x,q.y];
   if(type==='rect'||type==='ellipse'||type==='cloud'){const dx=q.x-a[0],dy=q.y-a[1],s=Math.max(Math.abs(dx),Math.abs(dy));return[a[0]+Math.sign(dx||1)*s,a[1]+Math.sign(dy||1)*s]}
@@ -1268,7 +1280,7 @@ stage.addEventListener('pointermove',e=>{
     case 'erase':eraseAt(e.clientX,e.clientY,drag);break;
     case 'vtx':{const m=P.marks.find(x=>x.id===drag.id);if(!m)return;if(!drag.undo){pushUndo();drag.undo=true}const p=snapPt(q.x,q.y);m.pts[drag.vi]=p;renderMarks();if(drag.touch)showLoupe(e.clientX,e.clientY,p);setBar((m.type==='area'?'พื้นที่ ':m.type==='measure'?'ระยะ ':'')+(m.type==='measure'||m.type==='area'?markValue(m,d):fmtLen(segLen(m.pts),d)),false);break}
     case 'stroke':{const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];const pts=drag.mark.pts;
-      for(const ev of (evs.length?evs:[e])){const r=toPx(ev.clientX,ev.clientY),l=pts[pts.length-1];if(Math.hypot(r.x-l[0],r.y-l[1])*zoom>=1.5)pts.push([r.x,r.y])}
+      for(const ev of (evs.length?evs:[e])){const r=toPx(ev.clientX,ev.clientY);const sm=drag.sm||(drag.sm=[pts[0][0],pts[0][1]]);const a=pts.length<4?.35:.55;sm[0]+=(r.x-sm[0])*a;sm[1]+=(r.y-sm[1])*a;const l=pts[pts.length-1];if(Math.hypot(sm[0]-l[0],sm[1]-l[1])*zoom>=1.2)pts.push([sm[0],sm[1]])}
       drawLive(drag.mark);break}
     case 'shape':{const m=drag.mark;m.pts[1]=constrain(m.pts[0],q,m.type,e.shiftKey);drawLive(m);
       if((m.type==='measure'||m.type==='calib')&&!e.shiftKey)m.pts[1]=snapPt(q.x,q.y);drawLive(m);
@@ -1295,7 +1307,7 @@ function endPtr(e){
     case 'vtx':{setBar(poly?'':null);const m=P.marks.find(x=>x.id===dr.id);if(dr.moved){save();renderMarks()}else if(m&&(mode==='measure'||mode==='area'||(mode==='takeoff'&&!dropMode)))placePolyPoint([...m.pts[dr.vi]],false);break}
     case 'place':{drawLive(null);placePolyPoint(dr.p,false);break}
     case 'erase':if(dr.undo)save();break;
-    case 'stroke':{const m=dr.mark;if(m.pts.length===1)m.pts.push([m.pts[0][0]+.5/zoom,m.pts[0][1]]);drawLive(null);commitMark(m);break}
+    case 'stroke':{const m=dr.mark;if(m.pts.length===1)m.pts.push([m.pts[0][0]+.5/zoom,m.pts[0][1]]);else{const l=toPx(e.clientX,e.clientY);m.pts.push([l.x,l.y]);m.pts=smoothStroke(m.pts)}drawLive(null);commitMark(m);break}
     case 'shape':{const m=dr.mark;drawLive(null);setBar(poly?'':null);
       if(segLen(m.pts)*zoom<4&&m.type!=='rect'&&m.type!=='ellipse'&&m.type!=='cloud')break;
       if(Math.abs(m.pts[1][0]-m.pts[0][0])*zoom<4&&Math.abs(m.pts[1][1]-m.pts[0][1])*zoom<4)break;
@@ -2105,7 +2117,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-3020P · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-3050C · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
@@ -2126,6 +2138,8 @@ function openSettings(){
     <div class="f full"><label>ชื่อโครงการ (แสดงที่หัวกระดาษ)</label><input class="in" id="sName" value="${esc(P.name)}"></div>
     ${titleField('sTitle',H.title)}
     <div class="f full"><label>ระบบงาน (ใช้ทั้งโครงการ — แสดงครั้งเดียวที่หัวกระดาษ)</label><select class="in" id="sSys">${(()=>{const ps=projSys();return (SYSTEMS.includes(ps)?SYSTEMS:[ps,...SYSTEMS]).map(x=>`<option ${x===ps?'selected':''}>${x}</option>`).join('')})()}</select></div>
+    ${P.drawings.length?`<div class="f full"><label>สเกลแบบ (Scale) — กรอกได้ทีละแผ่น</label><table class="tkt scset"><thead><tr><th>แบบ</th><th>กระดาษ</th><th>มาตราส่วน 1 :</th></tr></thead><tbody>${P.drawings.map(d=>{const sc=d.scale||defScale(d),pn=d.paperMM?(paperName(d.paperMM.w,d.paperMM.h)||'PDF'):'';const cal=sc.mode==='cal';const pv=cal?(d.paperMM?'auto':(sc.paper&&sc.paper!=='auto'?sc.paper:'A3')):(sc.paper==='auto'&&!d.paperMM?'A3':sc.paper);
+      return `<tr data-did="${d.id}"><td class="u">${esc(d.name)}${cal?'<div class="muted" style="font-size:12px">ตอนนี้: Calibrated — แก้ค่าแล้วจะเปลี่ยนเป็นสเกลกระดาษ</div>':''}</td><td><select class="in sp" style="min-width:110px">${d.paperMM?`<option value="auto" ${pv==='auto'?'selected':''}>อัตโนมัติ (PDF ${pn})</option>`:''}${['A4','A3','A2','A1','A0'].map(k=>`<option ${pv===k?'selected':''}>${k}</option>`).join('')}</select></td><td><input class="in sn" type="number" min="1" step="1" value="${sc.N||100}" data-init="${sc.N||100}" data-pinit="${pv}" style="width:110px"></td></tr>`}).join('')}</tbody></table><label style="margin-top:6px"><input type="checkbox" id="sScAll"> ใช้ค่าแถวแรกกับทุกแผ่น</label></div>`:''}
     <div class="f"><label>Doc. No.</label><input class="in" id="sDoc" value="${esc(H.docNo)}"></div>
     <div class="f"><label>Rev.</label><input class="in" id="sRev" value="${esc(H.rev)}"></div>
     <div class="f"><label>Date (วันที่ออกรายงาน)</label><input class="in" id="sEff" type="date" value="${esc(H.effDate)}"></div>
@@ -2144,6 +2158,10 @@ function openSettings(){
     m.querySelector('#sSave').onclick=()=>{
       P.name=m.querySelector('#sName').value.trim()||P.name;
       Object.assign(H,{title:m.querySelector('#sTitle').value.trim(),docNo:m.querySelector('#sDoc').value.trim(),rev:m.querySelector('#sRev').value.trim(),effDate:m.querySelector('#sEff').value,inspector:m.querySelector('#sIns').value.trim(),logo,system:m.querySelector('#sSys').value});P.points.forEach(q=>q.system=H.system);renderList();
+      {const rows=[...m.querySelectorAll('.scset tr[data-did]')],all=m.querySelector('#sScAll')&&m.querySelector('#sScAll').checked;const f=rows[0];
+        rows.forEach(tr=>{const d=P.drawings.find(x=>x.id===tr.dataset.did);if(!d)return;const src=all?f:tr;let pv=src.querySelector('.sp').value;const N=parseFloat(src.querySelector('.sn').value);if(!(N>0))return;
+          if(pv==='auto'&&!d.paperMM)pv='A3';const inp=tr.querySelector('.sn');if(!all&&+inp.dataset.init===N&&src.querySelector('.sp').value===inp.dataset.pinit)return;
+          d.scale={mode:'paper',paper:pv,orient:(d.scale&&d.scale.orient)||'auto',N};d.scaleOk=false});renderScaleCtl();renderMarks();renderTk()}
       Object.assign(O,{frame1:m.querySelector('#sF1').value,cropPct:+m.querySelector('#sCrop').value,keyplan:m.querySelector('#sKey').checked,exportMarks:m.querySelector('#sMk').checked,cols:+m.querySelector('#sCols').value});renderExpInfo();
       close();save();persist().then(renderProjSel);
     };
@@ -2209,7 +2227,11 @@ $('#eraseAll').onclick=async()=>{const d=curDwg();if(!d)return;const n=P.marks.f
 function renderSwatches(){$('#swatches').innerHTML=COLORS.map(c=>`<button data-c="${c}" class="${c===curColor?'on':''}" style="background:${c}" title="${c}"></button>`).join('');const cc=$('#ccLbl'),custom=!COLORS.includes(curColor);cc.classList.toggle('on',custom);cc.style.background=custom?curColor:'';cc.querySelector('span').style.display=custom?'none':''}
 renderSwatches();$('#swatches').onclick=e=>{const b=e.target.closest('[data-c]');if(!b)return;curColor=b.dataset.c;renderSwatches();
   if(selMark){const m=P.marks.find(x=>x.id===selMark);if(m){pushUndo();m.color=curColor;save();renderMarks()}}else if(!NONSEL.includes(mode)||mode==='eraser')setMode('pen')};
-$('#sizes').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;curSize=b.dataset.s;$('#sizes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+function setSize(v){curSize=v;try{localStorage.setItem('drawnote-size',JSON.stringify(v))}catch(e){}$('#sizes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.s===v));const n=szw(v);$('#szR').value=n;$('#szV').textContent=n;
+  if(selMark){const m=P.marks.find(x=>x.id===selMark);if(m){pushUndo();m.size=curSize;save();renderMarks()}}}
+try{const v=JSON.parse(localStorage.getItem('drawnote-size')||'null');if(v!=null){curSize=v;setTimeout(()=>{$('#sizes').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.s===v));$('#szR').value=szw(v);$('#szV').textContent=szw(v)},0)}}catch(e){}
+$('#szR').oninput=e=>{const v=+e.target.value;$('#szV').textContent=v;setSize(v)};
+$('#sizes').onclick=e=>{const b=e.target.closest('[data-s]');if(!b)return;setSize(b.dataset.s);return;
   if(selMark){const m=P.marks.find(x=>x.id===selMark);if(m){pushUndo();m.size=curSize;save();renderMarks()}}};
 $('#bEye').onclick=()=>{showMarks=!showMarks;$('#bEye').classList.toggle('on',!showMarks);toast(showMarks?'แสดง Markup':'ซ่อน Markup');renderMarks()};
 $('#unitSeg').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;P.opts.unit=b.dataset.u;save();renderScaleCtl();renderMarks();if(poly)drawPoly()};
@@ -2491,9 +2513,12 @@ function nearestOnTk(x,y){const d=curDwg();let best=null;tkMarks().filter(m=>m.d
   (m.drops||[]).forEach((dp,i)=>{const dd=Math.hypot(dp.p[0]-x,dp.p[1]-y);if(dd*zoom<18&&(!best||dd<best.d))best={m,drop:i,d:dd}});
   for(let i=1;i<m.pts.length;i++){const a=m.pts[i-1],b=m.pts[i],vx=b[0]-a[0],vy=b[1]-a[1],L=vx*vx+vy*vy||1;let t=((x-a[0])*vx+(y-a[1])*vy)/L;t=Math.max(0,Math.min(1,t));const px=a[0]+vx*t,py=a[1]+vy*t,dd=Math.hypot(px-x,py-y);
     if(dd*zoom<24&&(!best||(best.drop==null&&dd<best.d)))best={m,p:[px,py],d:dd}}});return best}
-async function dropTap(x,y){const h=nearestOnTk(x,y);if(!h){toast('แตะบนเส้นถอดปริมาณเพื่อวางจุดแนวดิ่ง ⭕');return}
-  if(h.drop!=null){openTk(h.m,false);return}
-  pushUndo();h.m.drops=h.m.drops||[];h.m.drops.push({p:h.p,len:0,label:''});save();renderMarks();renderTk();toast(`⭕ วางจุดแนวดิ่งบน L${h.m.no||''} แล้ว — ใส่ระยะได้ที่รายละเอียดเส้น (แตะวงกลม)`,3000)}
+async function dropTap(x,y){if(poly){toast('จบเส้นที่กำลังลากก่อน (✓ จบเส้น) แล้วค่อยวางจุดแนวดิ่ง');return}const h=nearestOnTk(x,y);
+  if(h&&h.drop!=null){openTk(h.m,false);return}
+  const v=await ask('⭕ จุดแนวดิ่ง',h?`ติดกับเส้น L${h.m.no||''} ${h.m.item||''} — กรอกระยะแนวดิ่ง (เมตร) เช่น 3.2`:'จุดเดี่ยว (ไม่ติดเส้น) — กรอกระยะแนวดิ่ง (เมตร) เช่น 3.2 แล้วระบุรายการ',{input:'',ok:'วางจุด'});
+  if(v==null)return;const len=parseFloat(String(v).replace(/,/g,''));if(!(len>=0)){toast('ใส่ตัวเลขระยะให้ถูกต้อง');return}
+  if(h){pushUndo();h.m.drops=h.m.drops||[];h.m.drops.push({p:h.p,len,label:''});save();renderMarks();renderTk();const t=tkCalc(h.m);toast(`⭕ L${h.m.no||''} แนวดิ่ง ${fmtM(len)} · รวม ${t?fmtM(t.total):''}`);return}
+  const m=newMark('takeoff',[[x,y]]);m.drops=[{p:[x,y],len,label:''}];m.mult=1;m.single=true;openTk(m,true)}
 function focusMark(m){const d=P.drawings.find(x=>x.id===m.drawingId);if(!d)return;if(P.active!==d.id){P.active=d.id;renderTabs();renderStage()}const[a,b,c,e]=markBBox(m);centerOn({drawingId:d.id,x:(a+c)/2/d.w,y:(b+e)/2/d.h});selMark=m.id;renderMarks()}
 function boqU(){return(P&&(P.opts.boqUnit||'m'))==='mm'?'mm':'m'}
 function uv(v){return boqU()==='mm'?Math.round(v*1000):+v.toFixed(2)}
@@ -2622,7 +2647,7 @@ function renderTkOpts(){if(!P)return;document.querySelectorAll('#tkLineSeg butto
 $('#tkLineSeg').onclick=e=>{const b=e.target.closest('[data-l]');if(!b)return;P.opts.tkLine=b.dataset.l;save();renderTkOpts();toast(b.dataset.l==='straight'?'เส้นตรง: แตะ 2 จุด แล้วยืนยันรายละเอียด':'Polyline: แตะทีละจุด แล้วกด ✓ จบเส้น (Confirm)')};
 $('#tkOrtho').onclick=()=>{P.opts.tkOrtho=!P.opts.tkOrtho;save();renderTkOpts();if(poly)drawPoly();toast(P.opts.tkOrtho?'ตั้งฉาก: เส้นจะล็อกแนวนอน/แนวตั้ง':'ปิดตั้งฉาก')};
 $('#pbBack').onclick=()=>{if(!poly||poly.pts.length<2)return;poly.pts.pop();poly.hover=null;drawPoly();renderMarks()};
-$('#tkDropBtn').onclick=()=>{dropMode=!dropMode;if(poly)cancelPoly();$('#tkDropBtn').classList.toggle('on',dropMode);toast(dropMode?'⭕ แตะบนเส้นเพื่อจุดวงกลมแนวดิ่ง (ใส่ระยะทีหลังได้)':'กลับไปลากเส้น Polyline')};
+$('#tkDropBtn').onclick=()=>{dropMode=!dropMode;if(poly)cancelPoly();$('#tkDropBtn').classList.toggle('on',dropMode);toast(dropMode?'⭕ แตะเพื่อวางจุดแนวดิ่ง แล้วกรอกระยะ (แตะบนเส้น = รวมกับเส้นนั้น)':'กลับไปลากเส้น Polyline')};
 
 
 /* ---- workspace: Site Report / Backup-BOQ ---- */
