@@ -703,6 +703,10 @@ body.dev-mobile .grp{padding:5px}
 #iabBar{background:#fff4e5;border:1px solid #f5c48a;color:#8a4b00;border-radius:12px;padding:8px 12px;font-size:13.5px;display:flex;gap:8px;align-items:center}
 #iabBar[hidden]{display:none}
 #iabBar b{color:#5f3300}
+.mbar{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px 6px 5px 12px;display:flex;gap:8px;align-items:center;z-index:5;box-shadow:0 6px 20px rgba(0,0,0,.15);white-space:nowrap}
+.mbar[hidden]{display:none}
+.mbar .seg button{padding:7px 12px;font-weight:600}
+body.dev-mobile .mbar .seg button,body.dev-tablet .mbar .seg button{padding:10px 14px}
 </style>
 </head>
 <body>
@@ -761,6 +765,7 @@ body.dev-mobile .grp{padding:5px}
    <div class="tabs" id="tabs"></div>
    <div id="stage">
     <div id="world"><img id="dwg" alt=""><svg id="mk" xmlns="http://www.w3.org/2000/svg"><g id="mkAll"></g><g id="mkLive"></g></svg><div id="pins"></div></div>
+    <div id="measBar" class="mbar" hidden><span class="lbl">วัดระยะ</span><div class="seg" id="measSeg"><button data-m="two">① 2 จุด</button><button data-m="chain">② ต่อเนื่อง</button></div></div>
     <div id="polyBar" class="pbar" hidden><span id="pbTxt"></span><button class="ok" id="pbOk">✓ เสร็จ</button><button id="pbX">✕ ยกเลิก</button></div>
     <div class="sb v" id="sbV"><div class="th"></div></div><div class="sb h" id="sbH"><div class="th"></div></div>
     <div id="empty"><div class="drop">
@@ -936,7 +941,7 @@ const HINTS={
  pen:'ลากเพื่อเขียน · ใช้ Apple Pencil / S-Pen ได้ (เมื่อใช้ปากกา นิ้วจะใช้เลื่อน/ซูมแทน) · Space+ลาก = เลื่อนแบบ',
  shape:'ลากเพื่อวาด · กด Shift = แนวตรง / จัตุรัส',
  text:'คลิกตำแหน่งที่จะวางข้อความ',
- measure:'ลาก = วัดระยะ 2 จุด · หรือคลิกทีละจุดเพื่อวัดต่อเนื่อง (แนวท่อ/ท่อลม) แล้วดับเบิลคลิก / Enter / ✓ เพื่อจบ · Shift = แนวตรง',
+ measure:'โหมด ① 2 จุด: แตะจุดแรก → แตะจุดที่สอง (หรือลากเส้น) · โหมด ② ต่อเนื่อง: แตะทีละจุดตามแนวท่อ แล้วกด ✓ เสร็จ / ดับเบิลคลิก / Enter · Shift = แนวตรง',
  area:'คลิกทีละมุม แล้วคลิกจุดแรก / ดับเบิลคลิก / Enter เพื่อปิดพื้นที่',
  eraser:'แตะหรือลากผ่าน Markup เพื่อลบ (ไม่ลบหมุด Point)',
  calib:'ลากเส้นทับระยะที่รู้ค่าจริงบนแบบ (เช่น ระยะ Grid) แล้วใส่ค่าระยะจริง'
@@ -1053,6 +1058,7 @@ function setMode(m){
   $('#bDraw').classList.toggle('on',!!DRAWMODES[m]);$('#drawLbl').textContent=DRAWMODES[m]||'Drawing';
   stage.classList.toggle('pt',m==='point');stage.classList.toggle('draw',NONSEL.includes(m)&&m!=='eraser');stage.classList.toggle('erase',m==='eraser');
   $('#scCal').classList.toggle('on',m==='calib');
+  $('#measBar').hidden=m!=='measure';renderMeasSeg();
   $('#hint').textContent=(HINTS[m]||HINTS[SHAPES.includes(m)?'shape':m==='hl'?'pen':'select'])+(penSeen?'  ·  ✍ โหมดปากกา: นิ้ว = เลื่อน/ซูม':'');
   if(m!=='select'&&selMark){selMark=null;renderMarks()}
 }
@@ -1087,6 +1093,7 @@ async function calibrateFrom(m){
   save();renderScaleCtl();renderMarks();toast('Calibrate แล้ว: '+ppm(d).toFixed(2)+' px/m — ใช้วัดระยะได้ทันที',3500);
 }
 
+function renderMeasSeg(){const v=(P&&P.opts.measMode)||'two';document.querySelectorAll('#measSeg button').forEach(b=>b.classList.toggle('on',b.dataset.m===v))}
 /* ---------- pointer interaction ---------- */
 const ptrs=new Map();let drag=null;
 const stage=$('#stage');
@@ -1098,7 +1105,7 @@ function constrain(a,q,type,shift){
 }
 function eraseAt(cx,cy,dr){const el=document.elementFromPoint(cx,cy);const mk=el&&el.closest&&el.closest('[data-mid]');if(mk){if(!dr.undo){pushUndo();dr.undo=true}P.marks=P.marks.filter(m=>m.id!==mk.dataset.mid);renderMarks()}}
 stage.addEventListener('pointerdown',e=>{
-  const d=curDwg();if(!d||e.target.closest('#empty,#polyBar'))return;
+  const d=curDwg();if(!d||e.target.closest('#empty,#polyBar,#measBar'))return;
   if(e.pointerType==='pen'&&!penSeen){penSeen=true;setMode(mode)}
   if(e.button===2)return;
   e.preventDefault();
@@ -1174,7 +1181,7 @@ function endPtr(e){
         const last=poly.pts[poly.pts.length-1];const pt=last?constrain(last,q,'line',e.shiftKey):[q.x,q.y];
         if(last&&Math.hypot(pt[0]-last[0],pt[1]-last[1])*zoom<6){finishPoly();break}
         if(poly.type==='area'&&poly.pts.length>=3){const f=poly.pts[0];if(Math.hypot(pt[0]-f[0],pt[1]-f[1])*zoom<12){finishPoly();break}}
-        poly.pts.push(pt);poly.hover=null;drawPoly()}
+        poly.pts.push(pt);poly.hover=null;if(poly.type==='measure'&&(P.opts.measMode||'two')==='two'&&poly.pts.length>=2){finishPoly();break}drawPoly()}
       break}
   }
 }
@@ -1291,16 +1298,18 @@ async function renderPdfPage(pg,longSide){
   }
   throw new Error('หน่วยความจำอุปกรณ์ไม่พอสำหรับแปลงหน้านี้');
 }
-async function importDrawings(files){
+async function importDrawings(files,K){
+  if(!K)K=await classify(files);
   const added=[];const wasBusy=busyOn;if(!wasBusy)busy(true);
   try{
   for(const f of files){
     const base=(f.name||'drawing').replace(/\.[^.]+$/,'');
     try{
-      if(isPdf(f)){
+      if(K.pdf.includes(f)){
         if(!window.pdfjsLib){toast('โหลดตัวอ่าน PDF ไม่สำเร็จ — ต่ออินเทอร์เน็ตแล้วรีเฟรช หรือใช้เวอร์ชัน Offline',6000);continue}
         toast(`กำลังเปิด ${f.name}…`,0);
-        const pdf=await pdfjsLib.getDocument({data:new Uint8Array(await f.arrayBuffer()),isEvalSupported:false}).promise;
+        let buf;try{buf=new Uint8Array(await f.arrayBuffer())}catch(e){throw new Error('อ่านไฟล์จากเครื่องไม่ได้ ('+(e.name||e)+') — ลองบันทึกไฟล์ลงเครื่องก่อน แล้วเลือกใหม่จาก “ไฟล์/Downloads”')}
+        const pdf=await pdfjsLib.getDocument({data:buf,isEvalSupported:false}).promise;
         const n=Math.min(pdf.numPages,30);
         for(let i=1;i<=n;i++){
           toast(`กำลังแปลง ${f.name} หน้า ${i}/${n}…`,0);
@@ -1309,11 +1318,11 @@ async function importDrawings(files){
         }
         try{pdf.destroy()}catch(e){}
         if(pdf.numPages>30)toast('นำเข้าเฉพาะ 30 หน้าแรก',4000);
-      }else if(isImg(f)){
-        toast('กำลังโหลด '+f.name+'…',0);
+      }else if(K.img.includes(f)){
+        toast('กำลังโหลด '+(f.name||'รูป')+'…',0);
         const src=await compressImage(f,COARSE?4000:5000,.92);const im=await loadImg(src);
         const nd={id:uid(),name:base,src,w:im.naturalWidth,h:im.naturalHeight};nd.scale=defScale(nd);added.push(nd);
-      }else toast('ไม่รองรับไฟล์ '+f.name+' (รองรับ PDF / PNG / JPG)',4500);
+      }else toast('ไม่รองรับไฟล์ '+(f.name||'?')+' ['+(f.type||'ไม่ทราบชนิด')+'] (รองรับ PDF / PNG / JPG)',6000);
     }catch(e){console.error(e);toast('เปิดไฟล์ไม่สำเร็จ: '+f.name+' — '+(e&&e.message||e),7000)}
   }
   }finally{if(!wasBusy)busy(false)}
@@ -1643,9 +1652,18 @@ let pendingPhotos=null;
 const isImg=f=>/^image\//.test(f.type)||/\.(png|jpe?g|webp|heic|heif|gif|bmp)$/i.test(f.name||'');
 const isPdf=f=>/pdf/i.test(f.type)||/\.pdf$/i.test(f.name||'');
 const isJson=f=>/json/i.test(f.type)||/\.json$/i.test(f.name||'');
+async function fileKind(f){
+  try{const b=new Uint8Array(await f.slice(0,8).arrayBuffer());
+    if(b[0]===0x25&&b[1]===0x50&&b[2]===0x44&&b[3]===0x46)return'pdf';
+    if((b[0]===0xFF&&b[1]===0xD8)||(b[0]===0x89&&b[1]===0x50&&b[2]===0x4E&&b[3]===0x47)||(b[0]===0x52&&b[1]===0x49&&b[2]===0x46&&b[3]===0x46)||(b[4]===0x66&&b[5]===0x74&&b[6]===0x79&&b[7]===0x70))return'img';
+    if(b[0]===0x7B||(b[0]===0xEF&&b[3]===0x7B))return'json';
+  }catch(e){}
+  return isPdf(f)?'pdf':isImg(f)?'img':isJson(f)?'json':'?';
+}
+async function classify(files){const out={pdf:[],img:[],json:[],other:[]};for(const f of files){const k=await fileKind(f);(out[k]||out.other).push(f)}return out}
 async function openInbox(files,src='ไฟล์'){
-  files=[...files];const imgs=files.filter(isImg),pdfs=files.filter(isPdf),jsons=files.filter(isJson);
-  if(!imgs.length&&!pdfs.length&&!jsons.length){toast('ไม่รองรับไฟล์นี้ (รองรับ รูป / PDF / ไฟล์งาน .json)',4000);return}
+  files=[...files];const K=await classify(files),imgs=K.img,pdfs=K.pdf,jsons=K.json;
+  if(!imgs.length&&!pdfs.length&&!jsons.length){toast('ไม่รองรับไฟล์นี้ (รองรับ รูป / PDF / ไฟล์งาน .json) — '+files.map(f=>(f.name||'?')+' ['+(f.type||'ไม่ทราบชนิด')+']').join(', '),7000);return}
   for(const j of jsons)await importWorkFile(j);
   if(pdfs.length)await importDrawings(pdfs);
   if(!imgs.length)return;
@@ -1801,6 +1819,7 @@ const EN={
 'แสดง Markup':'Show markup',
 'ซ่อน Markup':'Hide markup',
 'วัดระยะ (M)':'Measure (M)',
+'① 2 จุด':'① 2 points','② ต่อเนื่อง':'② Continuous','วัดระยะ: แตะ 2 จุด':'Measure: tap 2 points','วัดระยะ: ต่อเนื่อง — แตะทีละจุด แล้วกด ✓ เสร็จ':'Measure: continuous — tap points, then ✓ Done',
 'ติดตั้ง DrawNote เป็นแอป':'Install DrawNote as an app','เข้าใจแล้ว':'Got it',
 'กำลังเปิดในเบราว์เซอร์ของ LINE / แอปอื่น':'Opened inside LINE / another app browser','งานอาจไม่ถูกบันทึก':'work may not be saved','เปิดใน':'Open in','คัดลอกลิงก์':'Copy link','แชร์ → เพิ่มไปยังหน้าจอโฮม':'Share → Add to Home Screen','ติดตั้งแอป':'Install app','กดเมนู':'tap menu',
 'เครื่องมือ':'Tools','สี / ขนาดเส้น':'Colour / line width','มุมมอง':'View','สเกล & หน่วย':'Scale & unit','Export รายงาน':'Export report','PNG แบบ + Markup':'PNG drawing + markup','PDF แบบ + Markup':'PDF drawing + markup','1 คอลัมน์':'1 col','2 คอลัมน์':'2 col',
@@ -1879,6 +1898,18 @@ let deferredInstall=null;
 const IS_STANDALONE=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;if(!IS_STANDALONE)$('#bInstall').hidden=false});
 window.addEventListener('appinstalled',()=>{$('#bInstall').hidden=true;toast('ติดตั้ง DrawNote แล้ว — เปิดจากไอคอนบนหน้าจอโฮมได้เลย',5000)});
+async function runInstallCheck(el){
+  const ok=(c,t)=>`<div>${c?'✅':'❌'} ${t}</div>`;let h='';
+  h+=ok(location.protocol==='https:'||location.hostname==='localhost','เปิดผ่าน https (ลิงก์ Vercel)');
+  h+=ok(!IN_APP,IN_APP?'กำลังเปิดในเบราว์เซอร์ของ LINE/แอปอื่น → ต้องเปิดใน Chrome':'เปิดในเบราว์เซอร์ปกติ');
+  let man=false;try{const l=document.querySelector('link[rel=manifest]');if(l){const r=await fetch(l.href,{cache:'no-store'});man=r.ok&&!!(await r.json()).name}}catch(e){}
+  h+=ok(man,'ไฟล์ manifest.webmanifest อยู่ใน repo');
+  let sw=false;try{sw=!!(navigator.serviceWorker&&await navigator.serviceWorker.getRegistration())}catch(e){}
+  h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
+  h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
+  if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
+  el.innerHTML=h;
+}
 async function installApp(){
   if(deferredInstall){deferredInstall.prompt();try{await deferredInstall.userChoice}catch(e){}deferredInstall=null;return}
   const ios=IS_IOS;
@@ -1886,8 +1917,9 @@ async function installApp(){
     ${!/^https?:/.test(location.protocol)||!/vercel\.app|localhost/.test(location.host)?`<div class="muted">ติดตั้งได้จากลิงก์เว็บของคุณ เช่น <b>drawnote-beta.vercel.app</b></div>`:''}
     ${IN_APP?`<div style="color:#b45309"><b>ขั้นแรก:</b> เปิดหน้านี้ใน ${ios?'Safari':'Chrome'} ก่อน (เมนู ⋯ → เปิดใน ${ios?'Safari':'Chrome'})</div>`:''}
     ${ios?`<ol style="margin:0;padding-left:20px;line-height:1.9"><li>เปิดใน <b>Safari</b></li><li>กดปุ่ม <b>แชร์ ⤴</b> (ด้านล่างจอ / มุมขวาบนบน iPad)</li><li>เลือก <b>เพิ่มไปยังหน้าจอโฮม</b></li><li>กด <b>เพิ่ม</b> → ไอคอน DrawNote จะอยู่บนหน้าจอโฮม</li></ol>`
-         :`<ol style="margin:0;padding-left:20px;line-height:1.9"><li>เปิดใน <b>Chrome</b></li><li>กดเมนู <b>⋮</b> มุมขวาบน</li><li>เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก</b></li><li>หลังติดตั้ง แชร์รูป/PDF จาก LINE → เลือก <b>DrawNote</b> ได้เลย</li></ol>`}
-  </div><div class="mf"><span class="sp"></span><button class="btn pri" data-cancel>เข้าใจแล้ว</button></div>`,(m,close)=>{m.querySelector('[data-cancel]').onclick=close});
+         :`<ol style="margin:0;padding-left:20px;line-height:1.9"><li>เปิดใน <b>Chrome</b></li><li>กดเมนู <b>⋮</b> มุมขวาบน</li><li>เลือก <b>ติดตั้งแอป</b> หรือ <b>เพิ่มลงในหน้าจอหลัก → ติดตั้ง</b></li><li class="muted">Samsung Internet: เมนู ☰ → <b>เพิ่มหน้าไปยัง → หน้าจอหลัก</b></li><li>หลังติดตั้ง แชร์รูป/PDF จาก LINE → เลือก <b>DrawNote</b> ได้เลย</li></ol>`}
+    <div class="f"><label>ตรวจสอบความพร้อม</label><div id="instChk" class="muted">กำลังตรวจ…</div></div>
+  </div><div class="mf"><span class="sp"></span><button class="btn pri" data-cancel>เข้าใจแล้ว</button></div>`,(m,close)=>{m.querySelector('[data-cancel]').onclick=close;runInstallCheck(m.querySelector('#instChk'))});
 }
 /* ---------- settings ---------- */
 function openSettings(){
@@ -1944,11 +1976,12 @@ $('#bEye').onclick=()=>{showMarks=!showMarks;$('#bEye').textContent=showMarks?'�
 $('#unitSeg').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;P.opts.unit=b.dataset.u;save();renderScaleCtl();renderMarks();if(poly)drawPoly()};
 $('#scApply').onclick=applyPaperScale;$('#scN').onkeydown=e=>{if(e.key==='Enter')applyPaperScale()};
 $('#scCal').onclick=()=>{setMode('calib');toast('ลากเส้นทับระยะที่รู้ค่าจริงบนแบบ',3500)};
+$('#measSeg').onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;if(poly)cancelPoly();P.opts.measMode=b.dataset.m;save();renderMeasSeg();toast(b.dataset.m==='two'?'วัดระยะ: แตะ 2 จุด':'วัดระยะ: ต่อเนื่อง — แตะทีละจุด แล้วกด ✓ เสร็จ')};
 $('#pbOk').onclick=finishPoly;$('#pbX').onclick=cancelPoly;
 setMode('select');
 $('#zIn').onclick=()=>zoomCenter(1.25);$('#zOut').onclick=()=>zoomCenter(.8);$('#zFit').onclick=fit;
 $('#bUpload').onclick=$('#bUpload2').onclick=()=>$('#fileDwg').click();
-$('#fileDwg').onchange=e=>{const f=[...e.target.files];e.target.value='';const j=f.filter(isJson);j.forEach(importWorkFile);const d=f.filter(x=>!isJson(x));if(d.length)importDrawings(d)};
+$('#fileDwg').onchange=async e=>{const f=[...e.target.files];e.target.value='';if(!f.length)return;const K=await classify(f);K.json.forEach(importWorkFile);const d=[...K.pdf,...K.img];if(d.length)await importDrawings(d,K);if(K.other.length)toast('ไม่รองรับไฟล์: '+K.other.map(x=>(x.name||'?')+' ['+(x.type||'ไม่ทราบชนิด')+']').join(', '),7000)};
 $('#bUndo').onclick=undo;
 const guarded=fn=>async()=>{if(busyOn)return;busy(true);try{await fn()}catch(e){console.error(e);toast('เกิดข้อผิดพลาด: '+(e.message||e),5000)}finally{busy(false)}};
 $('#bExcel').onclick=guarded(exportExcel);
