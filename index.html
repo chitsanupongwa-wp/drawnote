@@ -800,6 +800,22 @@ body.dev-mobile #subbar .sw button,body.dev-mobile #subbar .cc{width:30px!import
 body.dev-mobile #subbar{flex-wrap:wrap;justify-content:center;row-gap:6px;overflow:visible;width:calc(100% - 16px);border-radius:18px!important}
 body.dev-mobile #subbar .sbs{border-left:none;padding-left:0}
 body.dev-mobile #subbar input[type=range]{width:80px}
+
+/* DN-4140 circle points + Point in BOQ */
+.pin{width:30px!important;height:30px!important;transform:translate(-50%,-50%) scale(calc(var(--inv,1) * var(--ps,1)))!important;transform-origin:50% 50%!important}
+.pin svg{width:30px!important;height:30px!important}
+body.dev-tablet .pin,body.dev-mobile .pin,body.dev-tablet .pin svg,body.dev-mobile .pin svg{width:36px!important;height:36px!important}
+.pin.sel svg circle{stroke:#1565c0;stroke-width:3.2}
+body.ws-boq #gbar [data-mode="point"]{display:inline-flex!important}
+body.ws-boq .listc{display:flex!important;flex:0 1 auto!important;max-height:38%}
+body.ws-boq #pins{opacity:1;pointer-events:auto}
+
+/* DN-4150 scale card fold */
+#scClose{display:inline-flex!important}
+#scFold{display:inline-flex;font-size:15px}
+body.sc-fold #toolcard>:not(.row1){display:none!important}
+body.sc-fold #toolcard{padding-top:8px!important;padding-bottom:8px!important}
+body.sc-fold #toolcard .row1{margin:0!important;border-bottom:none!important;padding-bottom:0!important}
 </style>
 </head>
 <body>
@@ -825,7 +841,7 @@ body.dev-mobile #subbar input[type=range]{width:80px}
    <button class="btn sm ghost" id="scAuto" title="อ่านขนาดกระดาษและ SCALE จากแบบอัตโนมัติ">✨ ตรวจอัตโนมัติ</button>
    <button class="btn sm pri" id="scApply">ใช้สเกลกระดาษ</button>
    <button class="btn sm" id="scCal">Calibrate</button>
-   <button class="ibtn" id="scClose" title="ปิด">✕</button>
+   <button class="ibtn" id="scFold" title="ย่อ / ขยาย">▴</button><button class="ibtn" id="scClose" title="ซ่อน (เปิดใหม่ที่ปุ่มสเกลบนแถบเครื่องมือ)">✕</button>
   </div>
   <div class="nd">นำเข้าแบบก่อน แล้วจึงตั้งขนาดกระดาษและมาตราส่วนได้</div>
   <div class="row2">
@@ -1051,7 +1067,7 @@ function renderStage(){
   renderPins();renderMarks();
 }
 function pinSVG(no,color){
-  return `<svg width="30" height="40" viewBox="0 0 30 40"><path d="M15 39C15 39 2 23.5 2 14.5A13 13 0 0 1 28 14.5C28 23.5 15 39 15 39Z" fill="${color}" stroke="#fff" stroke-width="2"/><text x="15" y="19.5" text-anchor="middle" font-family="Sarabun,sans-serif" font-weight="700" font-size="${String(no).length>2?10:13}" fill="#fff">${esc(no)}</text></svg>`;
+  return `<svg width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="13" fill="${color}" stroke="#fff" stroke-width="2.2"/><text x="15" y="15" dy=".36em" text-anchor="middle" font-family="Sarabun,sans-serif" font-weight="700" font-size="${String(no).length>2?10:String(no).length>1?12:14}" fill="#fff">${esc(no)}</text></svg>`;
 }
 function renderPins(){
   const d=curDwg();if(!d){$('#pins').innerHTML='';return}
@@ -1671,11 +1687,10 @@ async function renderHires(){
 }
 /* ---------- canvas rendering for export ---------- */
 function drawPin(ctx,x,y,r,no,color,hl,alpha=1){
-  ctx.save();ctx.globalAlpha=alpha;const cy=y-r*1.75;
-  if(hl){ctx.beginPath();ctx.arc(x,cy,r*2.1,0,Math.PI*2);ctx.strokeStyle='#e53935';ctx.lineWidth=r*.32;ctx.stroke()}
-  ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(x-r*.35,y-r*.55,x-r,cy+r*.6,x-r,cy);ctx.arc(x,cy,r,Math.PI,0);ctx.bezierCurveTo(x+r,cy+r*.6,x+r*.35,y-r*.55,x,y);ctx.closePath();
-  ctx.fillStyle=color;ctx.fill();ctx.lineWidth=r*.16;ctx.strokeStyle='#fff';ctx.stroke();
-  ctx.fillStyle='#fff';ctx.font=`700 ${r*(String(no).length>2?.8:1.05)}px Sarabun, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(no,x,cy+r*.05);ctx.restore();
+  ctx.save();ctx.globalAlpha=alpha;const R=r*1.15;
+  if(hl){ctx.beginPath();ctx.arc(x,y,R*1.9,0,Math.PI*2);ctx.strokeStyle='#e53935';ctx.lineWidth=r*.32;ctx.stroke()}
+  ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.lineWidth=r*.18;ctx.strokeStyle='#fff';ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font=`700 ${r*(String(no).length>2?.8:1.05)}px Sarabun, sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(no,x,y+r*.05);ctx.restore();
 }
 async function renderOverview(d,maxSide=2600){
   const im=await loadImg(d.src);const s=Math.min(1,maxSide/Math.max(d.w,d.h));const c=document.createElement('canvas');c.width=Math.round(d.w*s);c.height=Math.round(d.h*s);
@@ -2299,7 +2314,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-4130G · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-4150S · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
@@ -2950,6 +2965,10 @@ function editDrop(m,i){const dp=m.drops[i];if(!dp)return;
   renderUser();renderClock();setInterval(renderClock,20000);setTimeout(backupCheck,2500);applyCards();applyAsw();setWS(WS,true);
   if(!db)toast('เบราว์เซอร์นี้เก็บข้อมูลอัตโนมัติไม่ได้ — ใช้ “📂 งานที่บันทึกไว้ → ส่งออกไฟล์งาน” เพื่อเก็บงาน',6000);
 })();
+
+(()=>{const f=$('#scFold');const ap=on=>{document.body.classList.toggle('sc-fold',on);f.textContent=on?'▾':'▴';f.title=on?'ขยาย':'ย่อ';setTimeout(()=>{if(curDwg())applyT()},60)};
+ let v=false;try{v=localStorage.getItem('drawnote-scfold')==='1'}catch(e){}ap(v);
+ f.onclick=()=>{const on=!document.body.classList.contains('sc-fold');try{localStorage.setItem('drawnote-scfold',on?'1':'0')}catch(e){}ap(on)}})();
 </script>
 <script>if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('sw',e))}</script>
 <script>(async()=>{try{if(!/^https?:/.test(location.protocol))return;const l=document.querySelector('link[rel=manifest]');let ok=false;
