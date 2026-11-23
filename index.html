@@ -1219,8 +1219,8 @@ function prims(m,d){
       const t=tkCalc(m,d),val=t?fmtQ(t.total,t.unit):'';
       if(kind==='count'){const R=8*U*f;p.forEach((q,i)=>{o.push({k:'path',pts:[[q[0]-R,q[1]-R],[q[0]+R,q[1]-R],[q[0]+R,q[1]+R],[q[0]-R,q[1]+R]],closed:1,fill:col,stroke:'#fff',w:lw*.5});o.push({k:'text',x:q[0],y:q[1],t:String(i+1),fs:R*1.15,fill:'#fff',anchor:'middle',bold:1,nohalo:1})});
         tag();if(p.length){const l=p[p.length-1];lbl(l[0]+R*1.6,l[1]+R*2,(m.item?m.item+': ':'')+val,fs*1.05,col,'start')}break}
-      if(kind==='frame'&&p.length){const q=p[0],t2='L'+(m.no||''),tf=13*U*f,hw=tf*(.36*t2.length+.5),hh=tf*.85,cx=q[0]-tf*3.2,cy=q[1]-tf*3.2,ex=cx+hw*.6,ey=cy+hh,ah=tf*.75,ang=Math.atan2(q[1]-ey,q[0]-ex),bx=q[0]-Math.cos(ang)*ah,by=q[1]-Math.sin(ang)*ah,nx=-Math.sin(ang)*ah*.5,ny=Math.cos(ang)*ah*.5;
-        o.push({k:'path',pts:[[ex,ey],[bx,by]],stroke:col,w:lw*.7});o.push({k:'path',pts:[[q[0],q[1]],[bx+nx,by+ny],[bx-nx,by-ny]],closed:1,fill:col,stroke:col,w:lw*.3});
+      if(kind==='frame'&&p.length){const q=p[0],t2='L'+(m.no||''),tf=7*U*f,hw=tf*(.36*t2.length+.45),hh=tf*.8,cx=q[0]-tf*3,cy=q[1]-tf*3,ex=cx+hw*.6,ey=cy+hh,ah=tf*.75,ang=Math.atan2(q[1]-ey,q[0]-ex),bx=q[0]-Math.cos(ang)*ah,by=q[1]-Math.sin(ang)*ah,nx=-Math.sin(ang)*ah*.5,ny=Math.cos(ang)*ah*.5;
+        o.push({k:'path',pts:[[ex,ey],[bx,by]],stroke:col,w:lw*.45});o.push({k:'path',pts:[[q[0],q[1]],[bx+nx,by+ny],[bx-nx,by-ny]],closed:1,fill:col,stroke:col,w:lw*.3});
         o.push({k:'path',pts:[[cx-hw,cy-hh],[cx+hw,cy-hh],[cx+hw,cy+hh],[cx-hw,cy+hh]],closed:1,fill:col,stroke:'#fff',w:lw*.35});o.push({k:'text',x:cx,y:cy,t:t2,fs:tf,fill:'#fff',anchor:'middle',bold:1,nohalo:1});break}
       if(kind==='area'){o.push({k:'path',pts:p,closed:p.length>2,stroke:col,w:lw,fill:col,fillOp:.14});tag();
         if(p.length>2){const cx=p.reduce((s,q)=>s+q[0],0)/p.length,cy=p.reduce((s,q)=>s+q[1],0)/p.length;lbl(cx,cy,(m.item?m.item+': ':'')+val,fs*1.1,col)}break}
@@ -2340,7 +2340,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-4183A · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-4184A · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
