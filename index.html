@@ -836,6 +836,7 @@ body.dev-mobile #stage>#wsSeg button{width:52px;min-height:52px;font-size:9.5px}
 body.dev-mobile #stage>#wsSeg button i{font-size:19px}
 body.dev-mobile #stage>#wsSeg .wspos{width:52px;min-height:24px}
 body.mini #stage>#wsSeg{display:none}
+#mk .sop{opacity:.6;transition:opacity .15s}#mk g:hover>.sop,#mk g.sel>.sop{opacity:1}
 </style>
 </head>
 <body>
@@ -1189,6 +1190,20 @@ function cloudPts(a,b,r){
     for(let k=0;k<n;k++){const cx=p[0]+dx*rad*(2*k+1),cy=p[1]+dy*rad*(2*k+1);for(let s=0;s<=8;s++){const t=Math.PI*s/8;out.push([cx-dx*rad*Math.cos(t)+nx*rad*Math.sin(t),cy-dy*rad*Math.cos(t)+ny*rad*Math.sin(t)])}}}
   return out;
 }
+function frameBox(q,t2,tf,dx,dy,k){const hw=tf*(.36*t2.length+.45),hh=tf*.8;return{cx:q[0]+dx*tf*k,cy:q[1]+dy*tf*k,hw,hh}}
+let _FL={key:'',map:{}};
+function frameLayout(d){const fr=P.marks.filter(m=>m.drawingId===d.id&&m.type==='takeoff'&&m.kind==='frame'&&m.pts&&m.pts.length&&tkVisible(m)).sort((a,b)=>(a.no||0)-(b.no||0));
+  const U=tkU(d),key=d.id+'|'+U+'|'+fr.map(m=>m.id+':'+m.no+':'+m.pts[0][0].toFixed(1)+':'+m.pts[0][1].toFixed(1)+':'+(m.size||'M')).join(',');if(_FL.key===key)return _FL.map;
+  const map={},placed=[],DIRS=[[-1,-1],[1,-1],[-1,1],[1,1],[-1.25,0],[1.25,0],[0,-1.25],[0,1.25],[-.6,-1.2],[.6,-1.2],[-.6,1.2],[.6,1.2]],KS=[2.4,3.4,4.6,6,7.6,9.4];
+  const pts=fr.map(m=>m.pts[0]);
+  const hit=(b,pad)=>{for(const r of placed)if(Math.abs(b.cx-r.cx)<b.hw+r.hw+pad&&Math.abs(b.cy-r.cy)<b.hh+r.hh+pad)return true;
+    for(const p of pts)if(Math.abs(b.cx-p[0])<b.hw+pad&&Math.abs(b.cy-p[1])<b.hh+pad)return true;return false};
+  const segHit=(q,b)=>{for(const r of placed){const x0=r.cx-r.hw,x1=r.cx+r.hw,y0=r.cy-r.hh,y1=r.cy+r.hh;for(let t=.1;t<1;t+=.15){const x=b.cx+(q[0]-b.cx)*t,y=b.cy+(q[1]-b.cy)*t;if(x>x0&&x<x1&&y>y0&&y<y1)return true}}return false};
+  fr.forEach(m=>{const q=m.pts[0],t2='L'+(m.no||''),tf=7*U*szf(m.size||'M'),pad=tf*.3;let best=null;
+    for(const k of KS){for(const[dx,dy]of DIRS){const b=frameBox(q,t2,tf,dx,dy,k);if(!hit(b,pad)&&!segHit(q,b)){best=b;break}}if(best)break}
+    if(!best)for(const k of KS){for(const[dx,dy]of DIRS){const b=frameBox(q,t2,tf,dx,dy,k);if(!hit(b,pad)){best=b;break}}if(best)break}
+    if(!best)best=frameBox(q,t2,tf,-1,-1,2.4);placed.push(best);map[m.id]=best});
+  _FL={key,map};return map}
 function prims(m,d){
   const u=m.u||1,c=m.color,sz=m.size||'M',f=szf(sz),sw=szw(sz)*u,p=m.pts,o=[];
   const lbl=(x,y,t,fs,col,anchor='middle')=>o.push({k:'text',x,y,t,fs,fill:col,anchor,bold:1});
@@ -1219,9 +1234,11 @@ function prims(m,d){
       const t=tkCalc(m,d),val=t?fmtQ(t.total,t.unit):'';
       if(kind==='count'){const R=8*U*f;p.forEach((q,i)=>{o.push({k:'path',pts:[[q[0]-R,q[1]-R],[q[0]+R,q[1]-R],[q[0]+R,q[1]+R],[q[0]-R,q[1]+R]],closed:1,fill:col,stroke:'#fff',w:lw*.5});o.push({k:'text',x:q[0],y:q[1],t:String(i+1),fs:R*1.15,fill:'#fff',anchor:'middle',bold:1,nohalo:1})});
         tag();if(p.length){const l=p[p.length-1];lbl(l[0]+R*1.6,l[1]+R*2,(m.item?m.item+': ':'')+val,fs*1.05,col,'start')}break}
-      if(kind==='frame'&&p.length){const q=p[0],t2='L'+(m.no||''),tf=7*U*f,hw=tf*(.36*t2.length+.45),hh=tf*.8,cx=q[0]-tf*3,cy=q[1]-tf*3,ex=cx+hw*.6,ey=cy+hh,ah=tf*.75,ang=Math.atan2(q[1]-ey,q[0]-ex),bx=q[0]-Math.cos(ang)*ah,by=q[1]-Math.sin(ang)*ah,nx=-Math.sin(ang)*ah*.5,ny=Math.cos(ang)*ah*.5;
-        o.push({k:'path',pts:[[ex,ey],[bx,by]],stroke:col,w:lw*.45});o.push({k:'path',pts:[[q[0],q[1]],[bx+nx,by+ny],[bx-nx,by-ny]],closed:1,fill:col,stroke:col,w:lw*.3});
-        o.push({k:'path',pts:[[cx-hw,cy-hh],[cx+hw,cy-hh],[cx+hw,cy+hh],[cx-hw,cy+hh]],closed:1,fill:col,stroke:'#fff',w:lw*.35});o.push({k:'text',x:cx,y:cy,t:t2,fs:tf,fill:'#fff',anchor:'middle',bold:1,nohalo:1});break}
+      if(kind==='frame'&&p.length){const q=p[0],t2='L'+(m.no||''),tf=7*U*f;const L=(d&&frameLayout(d)[m.id])||frameBox(q,t2,tf,-1,-1,3);const{cx,cy,hw,hh}=L;
+        let ex,ey;{const vx=q[0]-cx,vy=q[1]-cy,sx=Math.abs(vx)>1e-9?hw/Math.abs(vx):1e9,sy=Math.abs(vy)>1e-9?hh/Math.abs(vy):1e9,t=Math.min(sx,sy,1);ex=cx+vx*t;ey=cy+vy*t}
+        const ah=tf*.75,ang=Math.atan2(q[1]-ey,q[0]-ex),bx=q[0]-Math.cos(ang)*ah,by=q[1]-Math.sin(ang)*ah,nx=-Math.sin(ang)*ah*.5,ny=Math.cos(ang)*ah*.5;
+        o.push({k:'path',pts:[[ex,ey],[bx,by]],stroke:col,w:lw*.45,sop:1});o.push({k:'path',pts:[[q[0],q[1]],[bx+nx,by+ny],[bx-nx,by-ny]],closed:1,fill:col,stroke:col,w:lw*.3,sop:1});
+        o.push({k:'path',pts:[[cx-hw,cy-hh],[cx+hw,cy-hh],[cx+hw,cy+hh],[cx-hw,cy+hh]],closed:1,fill:col,stroke:'#fff',w:lw*.35,sop:1});o.push({k:'text',x:cx,y:cy,t:t2,fs:tf,fill:'#fff',anchor:'middle',bold:1,nohalo:1,sop:1});break}
       if(kind==='area'){o.push({k:'path',pts:p,closed:p.length>2,stroke:col,w:lw,fill:col,fillOp:.14});tag();
         if(p.length>2){const cx=p.reduce((s,q)=>s+q[0],0)/p.length,cy=p.reduce((s,q)=>s+q[1],0)/p.length;lbl(cx,cy,(m.item?m.item+': ':'')+val,fs*1.1,col)}break}
       o.push({k:'path',pts:tkPts(m),stroke:col,w:lw});tag();
@@ -1246,9 +1263,9 @@ function pathD(pts,smooth,closed){
 }
 function primSVG(q,hit){
   if(q.k==='path'){const d=pathD(q.pts,q.smooth,q.closed);
-    return`<path d="${d}" fill="${q.fill||'none'}" ${q.fillOp!=null?`fill-opacity="${q.fillOp}"`:''} stroke="${q.stroke||'none'}" stroke-width="${q.w}" stroke-linecap="round" stroke-linejoin="round" ${q.op?`opacity="${q.op}"`:''} ${q.blend?'style="mix-blend-mode:multiply"':''}/>`+(hit?`<path class="hit" d="${d}"/>`:'')}
+    return`<path ${q.sop?'class="sop"':''} d="${d}" fill="${q.fill||'none'}" ${q.fillOp!=null?`fill-opacity="${q.fillOp}"`:''} stroke="${q.stroke||'none'}" stroke-width="${q.w}" stroke-linecap="round" stroke-linejoin="round" ${q.op?`opacity="${q.op}"`:''} ${q.blend?'style="mix-blend-mode:multiply"':''}/>`+(hit?`<path class="hit" d="${d}"/>`:'')}
   if(q.k==='ell')return`<ellipse cx="${q.cx}" cy="${q.cy}" rx="${q.rx}" ry="${q.ry}" fill="${q.fill||'none'}" stroke="${q.stroke}" stroke-width="${q.w}"/>`+(hit?`<ellipse class="hit" cx="${q.cx}" cy="${q.cy}" rx="${q.rx}" ry="${q.ry}"/>`:'');
-  if(q.k==='text')return`<text x="${q.x}" y="${q.y}" font-family="Sarabun,sans-serif" font-size="${q.fs}" font-weight="${q.bold?700:400}" fill="${q.fill}" text-anchor="${q.anchor}" dominant-baseline="middle" paint-order="stroke" stroke="#fff" stroke-width="${q.nohalo?0:q.fs*.28}" stroke-linejoin="round">${esc(q.t)}</text>`;
+  if(q.k==='text')return`<text ${q.sop?'class="sop"':''} x="${q.x}" y="${q.y}" font-family="Sarabun,sans-serif" font-size="${q.fs}" font-weight="${q.bold?700:400}" fill="${q.fill}" text-anchor="${q.anchor}" dominant-baseline="middle" paint-order="stroke" stroke="#fff" stroke-width="${q.nohalo?0:q.fs*.28}" stroke-linejoin="round">${esc(q.t)}</text>`;
   return'';
 }
 function drawPrims(ctx,list,k,ox,oy){
@@ -2340,7 +2357,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-4184A · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-4190L · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
