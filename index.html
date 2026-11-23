@@ -702,7 +702,8 @@ body.dev-mobile #polyBar.tk{bottom:10px;max-width:calc(100% - 12px)}
 
 #gbar .gb[data-mode="tkarea"]{--tc:#00838f}
 #gbar .gb[data-mode="tkcount"]{--tc:#6a1b9a}
-body.ws-site #gbar [data-mode="tkarea"],body.ws-site #gbar [data-mode="tkcount"]{display:none!important}
+#gbar .gb[data-mode="tkframe"]{--tc:#5d4037}
+body.ws-site #gbar [data-mode="tkarea"],body.ws-site #gbar [data-mode="tkcount"],body.ws-site #gbar [data-mode="tkframe"]{display:none!important}
 
 .ph{cursor:pointer}.ph .pen{position:absolute;right:3px;bottom:3px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;border-radius:6px;padding:0 5px}
 .pe canvas{max-width:100%;touch-action:none;box-shadow:0 0 0 1px #333}
@@ -807,7 +808,9 @@ body.dev-mobile #subbar input[type=range]{width:80px}
 body.dev-tablet .pin,body.dev-mobile .pin,body.dev-tablet .pin svg,body.dev-mobile .pin svg{width:36px!important;height:36px!important}
 .pin.sel svg circle{stroke:#111;stroke-width:2}.pin{filter:none!important}.pin.sel{filter:drop-shadow(0 0 3px rgba(0,0,0,.45))!important}
 body.ws-boq #gbar [data-mode="point"]{display:inline-flex!important}
-body.ws-boq .listc{display:flex!important;flex:0 1 auto!important;max-height:38%}
+body.ws-boq .listc{display:flex!important;flex:0 0 auto!important;max-height:170px;min-height:0!important}
+body.ws-boq aside.side .cardc.tkc{min-height:320px}
+body.ws-boq.nopts .listc{display:none!important}
 body.ws-boq #pins{opacity:1;pointer-events:auto}
 
 /* DN-4150 scale card fold */
@@ -816,6 +819,23 @@ body.ws-boq #pins{opacity:1;pointer-events:auto}
 body.sc-fold #toolcard>:not(.row1){display:none!important}
 body.sc-fold #toolcard{padding-top:8px!important;padding-bottom:8px!important}
 body.sc-fold #toolcard .row1{margin:0!important;border-bottom:none!important;padding-bottom:0!important}
+.tkt tr.frs td{background:#efebe9!important;color:#3e2723}
+.frsum{display:flex;align-items:center;gap:8px;margin:0 10px 8px;padding:9px 12px;border-radius:12px;background:#efebe9;color:#3e2723;font-weight:700;font-size:13px}.frsum span{display:block;font-weight:400;font-size:11.5px;color:#6d4c41}.frsum b{margin-left:auto;font-size:17px;white-space:nowrap}
+
+/* DN-4180 workspace rail (left) */
+.wsseg i{font-style:normal}
+.wsseg .wspos{width:30px;padding:0!important;opacity:.75;font-size:15px}
+#stage>#wsSeg{position:absolute;left:12px;top:50%;transform:translateY(-50%);z-index:30;display:flex;flex-direction:column;gap:6px;padding:8px;margin:0;border-radius:18px;background:rgba(250,250,251,.97)!important;border:1px solid #e2e5ea!important;box-shadow:0 10px 30px rgba(16,24,40,.16),0 1px 3px rgba(16,24,40,.08);cursor:default}
+#stage>#wsSeg button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;width:84px;min-height:70px;margin:0!important;padding:8px 4px!important;border-radius:14px!important;background:transparent!important;color:#1f2937!important;font-size:12px;font-weight:700;line-height:1.15;white-space:normal;text-align:center}
+#stage>#wsSeg button i{font-size:24px;line-height:1}
+#stage>#wsSeg button.on{background:var(--nv1,#2c5aa8)!important;color:#fff!important;box-shadow:0 4px 12px rgba(44,90,168,.35)}
+#stage>#wsSeg button:not(.on):not(.wspos):hover{background:#eef2f8!important}
+#stage>#wsSeg .wspos{min-height:28px!important;width:84px;font-size:14px;color:#6b7280!important;border-top:1px solid #e5e7eb!important;border-radius:0 0 10px 10px!important;margin-top:2px!important}
+body.dev-mobile #stage>#wsSeg{left:6px;padding:5px;gap:4px}
+body.dev-mobile #stage>#wsSeg button{width:52px;min-height:52px;font-size:9.5px}
+body.dev-mobile #stage>#wsSeg button i{font-size:19px}
+body.dev-mobile #stage>#wsSeg .wspos{width:52px;min-height:24px}
+body.mini #stage>#wsSeg{display:none}
 </style>
 </head>
 <body>
@@ -859,7 +879,7 @@ body.sc-fold #toolcard .row1{margin:0!important;border-bottom:none!important;pad
  <div class="main">
   <section class="card stagecard">
    <div id="gbar">
-    <div class="seg wsseg" id="wsSeg"><button data-w="site" class="on" title="Inspection / Defect / Picture Report">📋 <span>Site Report</span></button><button data-w="boq" title="ถอดปริมาณ">📏 <span>Backup-BOQ</span></button></div>
+    <div class="seg wsseg" id="wsSeg"><button data-w="site" class="on" title="Inspection / Defect / Picture Report"><i>📋</i><span>Site Report</span></button><button data-w="boq" title="ถอดปริมาณ"><i>📏</i><span>Backup-BOQ</span></button><button class="wspos" id="wsPos" title="ย้ายแถบ">⇤</button></div>
     <div class="gbt tools">
      <button class="gb" data-mode="select" data-lbl="เลือก" title="เลือก / เลื่อนแบบ (V)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3l12 9-5.5 1.2L10 19z"/></svg></button>
      <button class="gb" data-mode="point" data-lbl="Point" title="ระบุ Point No. (P)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></button>
@@ -875,6 +895,7 @@ body.sc-fold #toolcard .row1{margin:0!important;border-bottom:none!important;pad
      <button class="gb" data-mode="takeoff" data-lbl="Polyline ถอดปริมาณ" title="ถอดปริมาณ — ลากเส้น Polyline วัดความยาวรวม แล้วระบุรายการ (Q)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18l5-8 5 5 8-10"/><circle cx="3" cy="18" r="1.6" fill="currentColor"/><circle cx="8" cy="10" r="1.6" fill="currentColor"/><circle cx="13" cy="15" r="1.6" fill="currentColor"/><circle cx="21" cy="5" r="1.6" fill="currentColor"/></svg></button>
      <button class="gb" data-mode="tkarea" data-lbl="พื้นที่ m²" title="ถอดพื้นที่ (m²) — แตะมุมรอบพื้นที่ แล้วกด ✓"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 6l9-2 7 6-3 10H6z" fill="currentColor" fill-opacity=".18"/></svg></button>
      <button class="gb" data-mode="tkcount" data-lbl="นับจำนวน EA" title="นับจำนวน (EA) — แตะทีละจุด เช่น หัวสปริงเกอร์ หัวจ่ายลม"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="currentColor"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="currentColor"/></svg></button>
+     <button class="gb" data-mode="tkframe" data-lbl="วงกบท่อลม" title="ถอดวงกบท่อลม — แตะตำแหน่งท่อ แล้วกรอกขนาดท่อ กว้าง × สูง = ความยาวรอบวงกบ"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="18" height="12" rx="1.5"/><rect x="6.5" y="9" width="11" height="6" rx=".5" stroke-width="1.3" opacity=".6"/></svg></button>
      <button class="gb" data-mode="tkdrop" data-lbl="จุดแนวดิ่ง" title="จุดแนวดิ่ง — แตะจุดแล้วกรอกระยะ (แตะบนเส้น = รวมกับเส้นนั้น)"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 1.5v3M12 19.5v3"/></svg></button>
     </div>
     <span class="sp"></span>
@@ -1076,7 +1097,7 @@ function renderPins(){
 }
 function listRows(){const q=($('#fSearch').value||'').trim().toLowerCase(), fc=$('#fCur').checked;
   return ptsSorted().filter(p=>(!q||[p.no,p.location,p.desc,p.action,p.system].join(' ').toLowerCase().includes(q))&&(!fc||p.drawingId===P.active))}
-function renderList(){
+function renderList(){document.body.classList.toggle('nopts',!(P&&P.points&&P.points.length));
   $('#sum').innerHTML=`<b>${P.points.length}</b> Point · <b>${P.points.reduce((t,p)=>t+p.photos.length,0)}</b> รูป · <b>${P.drawings.length}</b> แบบ`;
   const arr=listRows();
   $('#list').innerHTML=arr.length?`<table class="ptab"><colgroup><col style="width:46px"><col><col style="width:54px"></colgroup><thead><tr><th>No.</th><th>ตำแหน่ง / รายละเอียด</th><th class="c">📷</th></tr></thead><tbody>${arr.map(p=>
@@ -1126,9 +1147,9 @@ const COLORS=['#fdd835','#00acc1','#e53935','#43a047','#1e88e5','#8e24aa','#2121
 const PAPERS={A0:[841,1189],A1:[594,841],A2:[420,594],A3:[297,420],A4:[210,297]};
 const DRAWMODES={pen:'ปากกา',hl:'ไฮไลท์',line:'เส้นตรง',arrow:'ลูกศร',rect:'สี่เหลี่ยม',ellipse:'วงกลม',cloud:'Cloud',text:'ข้อความ'};
 const SHAPES=['line','arrow','rect','ellipse','cloud','calib'];
-const NONSEL=['pen','hl','line','arrow','rect','ellipse','cloud','text','measure','area','eraser','calib','takeoff','tkarea','tkcount','tkdrop'];
+const NONSEL=['pen','hl','line','arrow','rect','ellipse','cloud','text','measure','area','eraser','calib','takeoff','tkarea','tkcount','tkdrop','tkframe'];
 let dropMode=false,tkAfterCal=false,cntSess=null;
-const TOOLC={select:'#121212',point:'#e53935',pen:'#1e88e5',shape:'#8e24aa',text:'#455a64',eraser:'#d81b60',measure:'#1f9d3a',area:'#00897b',takeoff:'#3949ab',tkarea:'#00838f',tkcount:'#6a1b9a',tkdrop:'#c62828',calib:'#121212'};
+const TOOLC={select:'#121212',point:'#e53935',pen:'#1e88e5',shape:'#8e24aa',text:'#455a64',eraser:'#d81b60',measure:'#1f9d3a',area:'#00897b',takeoff:'#3949ab',tkarea:'#00838f',tkcount:'#6a1b9a',tkframe:'#5d4037',tkdrop:'#c62828',calib:'#121212'};
 let selMark=null,curColor='#e53935',curSize='M',showMarks=true,penSeen=false,spaceDown=false,poly=null;
 const HINTS={
  select:'คลิกหมุด/Markup เพื่อเลือก · ลากเพื่อย้าย · Delete = ลบ · ดับเบิลคลิกข้อความเพื่อแก้ · ล้อเมาส์ = ซูมที่เคอร์เซอร์ · ลากพื้นที่ว่าง/Shift+ล้อ/Scrollbar = เลื่อนแบบ · 2 นิ้ว = ซูม',
@@ -1198,6 +1219,10 @@ function prims(m,d){
       const t=tkCalc(m,d),val=t?fmtQ(t.total,t.unit):'';
       if(kind==='count'){const R=8*U*f;p.forEach((q,i)=>{o.push({k:'path',pts:[[q[0]-R,q[1]-R],[q[0]+R,q[1]-R],[q[0]+R,q[1]+R],[q[0]-R,q[1]+R]],closed:1,fill:col,stroke:'#fff',w:lw*.5});o.push({k:'text',x:q[0],y:q[1],t:String(i+1),fs:R*1.15,fill:'#fff',anchor:'middle',bold:1,nohalo:1})});
         tag();if(p.length){const l=p[p.length-1];lbl(l[0]+R*1.6,l[1]+R*2,(m.item?m.item+': ':'')+val,fs*1.05,col,'start')}break}
+      if(kind==='frame'&&p.length){const q=p[0],H=34*U*f,ar=(+m.fw&&+m.fh)?Math.max(.25,Math.min(2.5,m.fw/m.fh)):.45,W=H*ar,x0=q[0]-W/2,y0=q[1]-H/2,x1=x0+W,y1=y0+H,fl=m.fsides==3?[[x0,y1],[x0,y0],[x1,y0],[x1,y1]]:m.fsides==2?null:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]];
+        o.push({k:'path',pts:[[x0,y0],[x1,y0],[x1,y1],[x0,y1]],closed:1,fill:col,fillOp:.12,stroke:col,w:lw*.3});
+        if(fl)o.push({k:'path',pts:fl,closed:m.fsides!=3,stroke:col,w:lw*1.6});else{o.push({k:'path',pts:[[x0,y0],[x0,y1]],stroke:col,w:lw*1.6});o.push({k:'path',pts:[[x1,y0],[x1,y1]],stroke:col,w:lw*1.6})}
+        tag();lbl(x1+fs*.5,q[1]-fs*.35,(m.item?m.item+' ':'')+frameTxt(m),fs*.95,col,'start');lbl(x1+fs*.5,q[1]+fs*.85,(+m.mult>1?m.mult+' ชุด · ':'')+val,fs*1.05,col,'start');break}
       if(kind==='area'){o.push({k:'path',pts:p,closed:p.length>2,stroke:col,w:lw,fill:col,fillOp:.14});tag();
         if(p.length>2){const cx=p.reduce((s,q)=>s+q[0],0)/p.length,cy=p.reduce((s,q)=>s+q[1],0)/p.length;lbl(cx,cy,(m.item?m.item+': ':'')+val,fs*1.1,col)}break}
       o.push({k:'path',pts:tkPts(m),stroke:col,w:lw});tag();
@@ -1334,7 +1359,7 @@ async function calibrateFrom(m){
 }
 
 let lastPen='pen',lastShape='rect',subOpen=true;
-function modeGroup(m){return(m==='pen'||m==='hl')?'pen':['line','arrow','rect','ellipse','cloud'].includes(m)?'shape':['text','measure','area','eraser','takeoff'].includes(m)?m:(m==='tkarea'||m==='tkcount'||m==='tkdrop')?m:null}
+function modeGroup(m){return(m==='pen'||m==='hl')?'pen':['line','arrow','rect','ellipse','cloud'].includes(m)?'shape':['text','measure','area','eraser','takeoff'].includes(m)?m:(m==='tkarea'||m==='tkcount'||m==='tkdrop'||m==='tkframe')?m:null}
 function renderSubbar(g){const sb=$('#subbar');sb.hidden=!(g&&subOpen);if(sb.hidden)return;let first=true;
   sb.querySelectorAll('.sbs').forEach(x=>{const on=x.dataset.for.split(' ').includes(g);x.style.display=on?'flex':'none';x.classList.toggle('first',on&&first);if(on)first=false});if(first){sb.hidden=true;return}
   $('#gbSub').classList.toggle('on',subOpen)}
@@ -1472,6 +1497,7 @@ function endPtr(e){
       if(mode==='text'){ask('ข้อความ','พิมพ์ข้อความที่จะวางบนแบบ',{input:'',ok:'วาง'}).then(t=>{if(t){const m=newMark('text',[[q.x,q.y]]);m.text=t;commitMark(m)}});break}
       if(mode==='tkdrop'){dropTap(q.x,q.y)}
       else if(mode==='tkcount'){countTap(snapPt(q.x,q.y))}
+      else if(mode==='tkframe'){frameTap(q.x,q.y)}
       else if(mode==='measure'||mode==='area'||mode==='takeoff'||mode==='tkarea'){placePolyPoint(e.shiftKey?[q.x,q.y]:snapPt(q.x,q.y),e.shiftKey)}
       break}
   }
@@ -2315,7 +2341,7 @@ async function runInstallCheck(el){
   h+=ok(sw,'ไฟล์ sw.js ทำงาน (Service Worker)');
   h+=ok(true,deferredInstall?'Chrome พร้อมติดตั้ง — กดปุ่ม 📲 อีกครั้ง':'ถ้าทุกข้อ ✅ แต่ยังไม่มีปุ่ม: เปิดหน้าใหม่ 1 ครั้ง แล้วใช้เมนู ⋮ → ติดตั้งแอป');
   if(IS_STANDALONE)h=ok(true,'กำลังใช้งานเป็นแอปอยู่แล้ว');
-  h+=`<div class="muted" style="margin-top:6px">Build: DN-4160M · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
+  h+=`<div class="muted" style="margin-top:6px">Build: DN-4181R · manifest: ${window.__DN_MANIFEST||'-'} · ${navigator.userAgent.match(/Chrome\/[\d]+|Version\/[\d.]+ Mobile|SamsungBrowser\/[\d.]+/)||''}</div>`;
   el.innerHTML=h;
 }
 async function installApp(){
@@ -2653,10 +2679,16 @@ const TKCOL=['#3949ab','#00897b','#8e24aa','#d81b60','#1e88e5','#6d4c41','#43a04
 function tkColor(item){const items=[...new Set(P.marks.filter(m=>m.type==='takeoff'&&m.item).map(m=>m.item))];const i=items.indexOf(item);return TKCOL[(i<0?items.length:i)%TKCOL.length]}
 function fmtM(v){if(v==null||!isFinite(v))return'-';return(P&&(P.opts.boqUnit||P.opts.unit)==='mm')?Math.round(v*1000).toLocaleString('en-US')+' mm':v.toFixed(2)+' m'}
 /* ---- takeoff core (unit-aware: line m / area m² / count EA) ---- */
-const KIND={line:{ic:'📏',t:'ความยาว'},area:{ic:'▱',t:'พื้นที่'},count:{ic:'🔢',t:'นับจำนวน'}};
+const KIND={line:{ic:'📏',t:'ความยาว'},area:{ic:'▱',t:'พื้นที่'},count:{ic:'🔢',t:'นับจำนวน'},frame:{ic:'▭',t:'วงกบท่อลม'}};
+function framePer(m){const W=(+m.fw||0)/1000,H=(+m.fh||0)/1000;return m.fsides==3?W+2*H:m.fsides==2?2*H:2*W+2*H}
+function frameTxt(m){return `${(+m.fw||0).toLocaleString('en-US')}×${(+m.fh||0).toLocaleString('en-US')} mm${m.fsides==3?' (3 ด้าน)':m.fsides==2?' (2 ด้าน)':''}`}
+function tkNote(m){return(m.kind==='frame'?'วงกบท่อลม '+frameTxt(m)+(m.note?' · ':''):'')+(m.note||'')}
+function frameTap(x,y){const last=tkMarks().filter(k=>k.kind==='frame').sort((a,b)=>String(b.at||'').localeCompare(String(a.at||'')))[0]||{};
+  const m=newMark('takeoff',[[x,y]]);m.kind='frame';delete m.segs;delete m.spline;m.mult=1;m.fw=last.fw||'';m.fh=last.fh||'';m.fsides=last.fsides||4;if(last.item){m.item=last.item;m.psize=last.psize||'';m.waste=last.waste||0}else{m.item='วงกบท่อลม';m.wtype=m.wtype||'งานท่อลม'}openTk(m,true)}
 function tkCalc(m,d){d=d||P.drawings.find(x=>x.id===m.drawingId);const k=ppm(d),kind=m.kind||'line',mult=+m.mult||1,waste=+m.waste||0;
   let plan=0,vert=0,unit='m';
   if(kind==='count'){plan=m.pts.length;unit='EA'}
+  else if(kind==='frame'){plan=framePer(m)}
   else{if(!k)return null;if(kind==='area'){plan=polyArea(m.pts)/k/k;unit='m²'}else{plan=segLen(tkPts(m))/k;vert=(m.drops||[]).reduce((t,x)=>t+(+x.len||0),0)}}
   const base=(plan+vert)*mult;let total=base*(1+waste/100);if(unit==='EA')total=Math.ceil(total-1e-9);
   return{kind,unit,plan,vert,mult,waste,base,total,nDrop:(m.drops||[]).length}}
@@ -2672,6 +2704,7 @@ function tkGroups(){const g=new Map();tkMarks().forEach(m=>{const t=tkCalc(m);if
   return[...g.values()].map(o=>({...o,price:tkPrice(o),amount:tkPrice(o)*o.total}))}
 function tkFloorGroups(){const g=new Map();tkMarks().forEach(m=>{const t=tkCalc(m);if(!t)return;const k=[m.floor||'-',m.zone||'-',m.item||'',m.psize||'',t.unit].join('|');const o=g.get(k)||{floor:m.floor||'-',zone:m.zone||'-',item:m.item||'(ไม่ระบุรายการ)',psize:m.psize||'',unit:t.unit,wtype:m.wtype||'',n:0,total:0};o.n++;o.total+=t.total;g.set(k,o)});
   return[...g.values()].sort((a,b)=>String(a.floor).localeCompare(String(b.floor),'th',{numeric:true})||String(a.zone).localeCompare(String(b.zone),'th',{numeric:true})||a.item.localeCompare(b.item,'th'))}
+function frameSum(){const fs=tkMarks().filter(m=>m.kind==='frame');let n=0,len=0;fs.forEach(m=>{const t=tkCalc(m);if(t){n+=t.mult;len+=t.total}});return{cnt:fs.length,n,len}}
 function unitTotals(g){const u={};g.forEach(o=>{u[o.unit]=(u[o.unit]||0)+o.total});return u}
 function tkU(d){return Math.max(d.w,d.h)/1600*(+P.opts.tkLbl||1)}
 function tkMarks(){return P.marks.filter(m=>m.type==='takeoff').sort((a,b)=>(a.no||1e9)-(b.no||1e9))}
@@ -2697,7 +2730,7 @@ function openTk(m,isNew,onBack,onSaved){const kind=m.kind||'line',K=KIND[kind];c
   const WT=[...new Set(['งานท่อน้ำ','งานท่อน้ำทิ้ง','งานท่อดับเพลิง','งานท่อลม','งานท่อน้ำยา','งานสายไฟ','งานท่อร้อยสาย','งานรางเดินสาย','งานหุ้มฉนวน',...uniq('wtype')])];
   const dl=(id,arr)=>`<datalist id="${id}">${arr.map(i=>`<option value="${esc(i)}">`).join('')}</datalist>`;
   let drops=(m.drops||[]).map(x=>({...x}));
-  const calc=()=>{const sp=document.querySelector('#tkSpl');return tkCalc({...m,drops,mult:+(document.querySelector('#tkMult')||{}).value||1,waste:+(document.querySelector('#tkWaste')||{}).value||0,spline:sp?sp.checked:m.spline},d)};
+  const calc=()=>{const sp=document.querySelector('#tkSpl'),fw=document.querySelector('#tkFW'),fh=document.querySelector('#tkFH'),fs=document.querySelector('#tkFS .on');return tkCalc({...m,drops,...(fw?{fw:+fw.value||0,fh:+fh.value||0,fsides:fs?+fs.dataset.v:4}:{}),mult:+(document.querySelector('#tkMult')||{}).value||1,waste:+(document.querySelector('#tkWaste')||{}).value||0,spline:sp?sp.checked:m.spline},d)};
   modal(`<div class="mh"><span class="ic" style="width:30px;height:30px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;background:#e8eaf6;color:#3949ab">📏</span>${m.no?'L'+m.no:'L'+tkNextNo()} · ${K.ic} ถอด${K.t} ${isNew?'— ใหม่':''}</div><div class="mb">
     <div class="f full"><label>ชื่อรายการ (ใช้รวมยอด) <b style="color:#c62828">*</b></label><input class="in" id="tkItem" list="tkItems" value="${esc(m.item||'')}" placeholder="เช่น ท่อ PPR Ø1&quot;, ท่อลม 400×300, สายไฟ THW 2.5"><datalist id="tkItems">${items.map(i=>`<option value="${esc(i)}">`).join('')}</datalist></div>
     <div class="f"><label>ขนาด / Size</label><input class="in" id="tkSize" list="tkSzL" value="${esc(m.psize||'')}" placeholder="เช่น 150A, Ø1&quot;, 400×300">${dl('tkSzL',uniq('psize'))}</div>
@@ -2706,33 +2739,36 @@ function openTk(m,isNew,onBack,onSaved){const kind=m.kind||'line',K=KIND[kind];c
     <div class="f"><label>หมวด / ระบบ</label><input class="in" id="tkCat" value="${esc(m.cat||projSys())}"></div>
     <div class="f"><label>พื้นที่ / ชั้น</label><input class="in" id="tkFl" list="tkFlL" value="${esc(m.floor||'')}" placeholder="เช่น ชั้น 3">${dl('tkFlL',uniq('floor'))}</div>
     <div class="f"><label>โซน</label><input class="in" id="tkZn" list="tkZnL" value="${esc(m.zone||'')}" placeholder="เช่น Zone A">${dl('tkZnL',uniq('zone'))}</div>
-    <div class="f"><label>${kind==='count'?'ตัวคูณ (ต่อจุด)':kind==='area'?'ตัวคูณ (จำนวนพื้นที่ซ้ำ)':'จำนวนเส้น (ตัวคูณ)'}</label><input class="in" id="tkMult" type="number" min="1" step="1" value="${+m.mult||1}"></div>
+    ${kind==='frame'?`<div class="f full"><label>ขนาดท่อลม / วงกบ (mm) <b style="color:#c62828">*</b></label><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="lbl">กว้าง W</span><input class="in" id="tkFW" type="number" min="0" step="1" value="${m.fw||''}" placeholder="400" style="flex:1;min-width:90px"><span class="lbl">× สูง H</span><input class="in" id="tkFH" type="number" min="0" step="1" value="${m.fh||''}" placeholder="300" style="flex:1;min-width:90px"></div>
+      <div class="seg" id="tkFS" style="margin-top:8px"><button data-v="4" class="${m.fsides!=3&&m.fsides!=2?'on':''}">รอบท่อ 4 ด้าน 2(W+H)</button><button data-v="3" class="${m.fsides==3?'on':''}">3 ด้าน W+2H</button><button data-v="2" class="${m.fsides==2?'on':''}">2 ด้าน 2H</button></div></div>`:''}
+    <div class="f"><label>${kind==='frame'?'จำนวนชุด (ตัวคูณ)':kind==='count'?'ตัวคูณ (ต่อจุด)':kind==='area'?'ตัวคูณ (จำนวนพื้นที่ซ้ำ)':'จำนวนเส้น (ตัวคูณ)'}</label><input class="in" id="tkMult" type="number" min="1" step="1" value="${+m.mult||1}"></div>
     <div class="f"><label>ราคา/หน่วย (บาท) <small style="color:var(--mu)">ใช้กับรายการ+ขนาดเดียวกัน</small></label><input class="in" id="tkPrice" type="number" min="0" step="0.01" value="${tkPrice({item:m.item,psize:m.psize,unit:kind==='count'?'EA':kind==='area'?'m²':'m'})||''}" placeholder="ไม่บังคับ"></div>
     ${kind==='line'&&m.pts.length>2&&!m.segs?`<div class="f"><label>รูปแบบเส้น</label><label style="display:flex;gap:8px;align-items:center;padding:8px 0;color:#121212"><input type="checkbox" id="tkSpl" ${m.spline?'checked':''}> เส้นโค้ง Spline</label></div>`:''}
-    <div class="f full" hidden><label>จุดลงแนวดิ่ง ⭕ (ระยะที่มองไม่เห็นในแปลน)</label><div id="tkDrops"></div><button class="btn sm ghost" id="tkAddDrop" style="justify-self:start;margin-top:6px">＋ เพิ่มจุดแนวดิ่ง (ที่ปลายเส้น)</button></div>
+    <div class="f full" hidden style="display:none"><label>จุดลงแนวดิ่ง ⭕ (ระยะที่มองไม่เห็นในแปลน)</label><div id="tkDrops"></div><button class="btn sm ghost" id="tkAddDrop" style="justify-self:start;margin-top:6px">＋ เพิ่มจุดแนวดิ่ง (ที่ปลายเส้น)</button></div>
     <div class="f full"><label>รายละเอียด</label><input class="in" id="tkNote" value="${esc(m.note||'')}" placeholder="เช่น จากห้องเครื่อง ถึง AHU-01"></div>
     <div class="f"><label>ผู้ถอดปริมาณ</label><input class="in" id="tkBy" list="tkByL" value="${esc(m.by||'')}">${dl('tkByL',[...new Set([USER.name,...uniq('by')].filter(Boolean))])}</div>
     <div class="f"><label>บันทึกเมื่อ</label><div class="in" style="background:#f7f7f3;padding:7px 10px">${m.at?fmtTS(m.at):'จะบันทึกเวลาอัตโนมัติ'}${m.editAt?` <span class="muted">· แก้ไข ${fmtTS(m.editAt)}</span>`:''}</div></div>
     <div class="f full"><div class="expbox" id="tkRes"></div></div>
   </div><div class="mf">${isNew?'<button class="btn red" id="tkDiscard">ทิ้งรายการนี้</button>':'<button class="btn red" id="tkDel">🗑 ลบ</button>'}${!isNew&&kind==='count'?'<button class="btn ghost" id="tkMore">＋ นับต่อ</button>':''}<span class="sp"></span><button class="btn ghost" data-cancel>${isNew&&onBack?'← กลับไปแก้เส้น':'ยกเลิก'}</button><button class="btn pri" id="tkOk">✓ ยืนยัน & บันทึก</button></div>`,(mm,close)=>{
-    const res=()=>{const t=calc();mm.querySelector('#tkRes').innerHTML=t?`<table class="tkt"><tr><td>${kind==='count'?'จำนวนจุด':kind==='area'?'พื้นที่ในแปลน':'แนวราบ (ในแปลน)'}</td><td class="n">${fmtQ(t.plan,t.unit)}</td></tr>${kind==='line'?`<tr><td>แนวดิ่ง ${t.nDrop} จุด</td><td class="n">${fmtM(t.vert)}</td></tr>`:''}<tr><td>ตัวคูณ</td><td class="n">× ${t.mult}</td></tr><tr><td>เผื่อเศษ</td><td class="n">+ ${t.waste} %</td></tr><tr class="tot"><td>รวม</td><td class="n">${fmtQ(t.total,t.unit)}</td></tr></table>`:'<span class="muted">ยังไม่มีสเกล — ตั้งสเกลก่อน</span>'};
+    const res=()=>{const t=calc();mm.querySelector('#tkRes').innerHTML=t?`<table class="tkt"><tr><td>${kind==='frame'?'ความยาวรอบวงกบ / ชุด (ท่อ '+(+(document.querySelector('#tkFW')||{}).value||0)+'×'+(+(document.querySelector('#tkFH')||{}).value||0)+')':kind==='count'?'จำนวนจุด':kind==='area'?'พื้นที่ในแปลน':'แนวราบ (ในแปลน)'}</td><td class="n">${fmtQ(t.plan,t.unit)}</td></tr>${kind==='line'?`<tr><td>แนวดิ่ง ${t.nDrop} จุด</td><td class="n">${fmtM(t.vert)}</td></tr>`:''}<tr><td>ตัวคูณ</td><td class="n">× ${t.mult}</td></tr><tr><td>เผื่อเศษ</td><td class="n">+ ${t.waste} %</td></tr><tr class="tot"><td>รวม</td><td class="n">${fmtQ(t.total,t.unit)}</td></tr>${kind==='frame'?(()=>{const F=frameSum(),cur=tkCalc(m);const o=(!isNew&&cur)?cur.total:0;return`<tr><td>รวมวงกบท่อลมทั้งโครงการ (รวมรายการนี้)</td><td class="n"><b>${fmtQ(F.len-o+t.total,'m')}</b></td></tr>`})():''}</table>`:'<span class="muted">ยังไม่มีสเกล — ตั้งสเกลก่อน</span>'};
     const dl=()=>{mm.querySelector('#tkDrops').innerHTML=drops.length?drops.map((x,i)=>`<div style="display:flex;gap:6px;align-items:center;margin-bottom:6px"><span style="width:22px;height:22px;border-radius:50%;border:2.5px solid #3949ab;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none">${i+1}</span><input class="in" data-dl="${i}" value="${esc(x.label||'')}" placeholder="เช่น ลงไปห้อง AHU / ขึ้นชั้น 4" style="flex:2"><input class="in" type="number" step="0.01" min="0" data-dv="${i}" value="${x.len}" style="flex:1;min-width:80px"><span class="lbl">m</span><button class="btn sm red" data-dx="${i}">✕</button></div>`).join(''):'<div class="muted">ยังไม่มี — ใช้ปุ่ม ⭕ ในแถบเครื่องมือเพื่อแตะวางบนเส้น หรือกดเพิ่มที่ปลายเส้น</div>';
       mm.querySelectorAll('[data-dv]').forEach(e=>e.oninput=()=>{drops[+e.dataset.dv].len=parseFloat(e.value)||0;res()});
       mm.querySelectorAll('[data-dl]').forEach(e=>e.oninput=()=>{drops[+e.dataset.dl].label=e.value});
       mm.querySelectorAll('[data-dx]').forEach(e=>e.onclick=()=>{drops.splice(+e.dataset.dx,1);dl();res()})};
-    dl();res();mm.querySelector('#tkMult').oninput=res;mm.querySelector('#tkWaste').oninput=res;{const mo=mm.querySelector('#tkMore');if(mo)mo.onclick=()=>{close();setMode('tkcount');cntSess=m.id;countBar()}}{const sp=mm.querySelector('#tkSpl');if(sp)sp.onchange=()=>{res();const was=m.spline;m.spline=sp.checked;renderMarks();drawLive(isNew?m:null);m.spline=was}}
+    dl();res();mm.querySelector('#tkMult').oninput=res;if(kind==='frame'){mm.querySelector('#tkFW').oninput=res;mm.querySelector('#tkFH').oninput=res;mm.querySelectorAll('#tkFS button').forEach(b=>b.onclick=()=>{mm.querySelectorAll('#tkFS button').forEach(x=>x.classList.toggle('on',x===b));res()});setTimeout(()=>{if(isNew&&m.item&&!m.fw)mm.querySelector('#tkFW').focus()},80)}mm.querySelector('#tkWaste').oninput=res;{const mo=mm.querySelector('#tkMore');if(mo)mo.onclick=()=>{close();setMode('tkcount');cntSess=m.id;countBar()}}{const sp=mm.querySelector('#tkSpl');if(sp)sp.onchange=()=>{res();const was=m.spline;m.spline=sp.checked;renderMarks();drawLive(isNew?m:null);m.spline=was}}
     mm.querySelector('#tkAddDrop').onclick=()=>{drops.push({p:[...m.pts[m.pts.length-1]],len:0,label:''});dl();res();const l=mm.querySelectorAll('[data-dv]');l[l.length-1].focus()};
     setTimeout(()=>{if(isNew)mm.querySelector('#tkItem').focus()},60);
     mm.querySelector('[data-cancel]').onclick=()=>{close();if(isNew&&onBack)onBack();else renderMarks()};
     const dis=mm.querySelector('#tkDiscard');if(dis)dis.onclick=()=>{close();renderMarks();toast('ทิ้งรายการแล้ว')};
     const del=mm.querySelector('#tkDel');if(del)del.onclick=async()=>{close();if(await ask('ลบเส้น L'+(m.no||''),'ต้องการลบเส้นถอดปริมาณนี้ใช่หรือไม่?',{ok:'ลบ',danger:true})){deleteMark(m.id);renderTk()}};
     mm.querySelector('#tkOk').onclick=()=>{const it=mm.querySelector('#tkItem').value.trim();if(!it){toast('กรอกชื่อรายการก่อนยืนยัน');mm.querySelector('#tkItem').focus();mm.querySelector('#tkItem').style.borderColor='#c62828';return}
+      if(kind==='frame'){const fw=+mm.querySelector('#tkFW').value||0,fh=+mm.querySelector('#tkFH').value||0,fs=mm.querySelector('#tkFS .on');if(!(fw>0&&fh>0)){toast('กรอกความกว้างและความสูงวงกบ (mm)');mm.querySelector(fw>0?'#tkFH':'#tkFW').focus();return}m.fw=fw;m.fh=fh;m.fsides=fs?+fs.dataset.v:4}
       {const sp=mm.querySelector('#tkSpl');if(sp)m.spline=sp.checked}
       const psize=mm.querySelector('#tkSize').value.trim(),pr=parseFloat(mm.querySelector('#tkPrice').value);{P.opts.prices=P.opts.prices||{};const key=priceKey({item:it,psize,unit:kind==='count'?'EA':kind==='area'?'m²':'m'});if(pr>0)P.opts.prices[key]=pr;else if(mm.querySelector('#tkPrice').value==='')delete P.opts.prices[key]}
       Object.assign(m,{psize,waste:Math.max(0,parseFloat(mm.querySelector('#tkWaste').value)||0),item:it,wtype:mm.querySelector('#tkWt').value.trim(),floor:mm.querySelector('#tkFl').value.trim(),zone:mm.querySelector('#tkZn').value.trim(),by:mm.querySelector('#tkBy').value.trim(),cat:mm.querySelector('#tkCat').value.trim(),mult:Math.max(1,parseFloat(mm.querySelector('#tkMult').value)||1),note:mm.querySelector('#tkNote').value.trim(),drops:drops.map(x=>({...x,len:+x.len||0}))});
       if(it)m.color=tkColor(it);if(!m.no)m.no=tkNextNo();if(isNew||!m.at)m.at=new Date().toISOString();else m.editAt=new Date().toISOString();
       close();if(isNew)commitMark(m);else{pushUndo();save();renderMarks()}renderTk();
-      const t=tkCalc(m);if(t)toast(`${it||'ถอดปริมาณ'}: ${fmtQ(t.total,t.unit)}`);if(onSaved)onSaved()};
+      const t=tkCalc(m);if(t)toast(`${it||'ถอดปริมาณ'}: ${fmtQ(t.total,t.unit)}`+(kind==='frame'?` · รวมวงกบท่อลม ${fmtQ(frameSum().len,'m')}`:''),3500);if(onSaved)onSaved()};
   })}
 function nearestOnTk(x,y){const d=curDwg();let best=null;tkMarks().filter(m=>m.drawingId===d.id&&(m.kind||'line')==='line').forEach(m=>{
   (m.drops||[]).forEach((dp,i)=>{const dd=Math.hypot(dp.p[0]-x,dp.p[1]-y);if(dd*zoom<18&&(!best||dd<best.d))best={m,drop:i,d:dd}});
@@ -2751,10 +2787,10 @@ function renderTk(){const el=$('#tkList');if(!el)return;const g=tkGroups(),all=t
   $('#tkSum').innerHTML=all.length?`<b>${all.length}</b> รายการ · <b>${g.length}</b> กลุ่ม`:'';
   const opt=(k,label)=>{const vals=[...new Set(all.map(m=>m[k]).filter(Boolean))];return`<select class="in tkf" data-k="${k}" style="flex:1;min-width:0"><option value="">${label}: ทั้งหมด</option>${vals.map(v=>`<option ${TKF[k]===v?'selected':''}>${esc(v)}</option>`).join('')}</select>`};
   const head=`<div class="tkbar"><span class="muted">หน่วยความยาว</span><div class="seg" id="tkUnit"><button data-u="m" class="${boqU()==='m'?'on':''}">m</button><button data-u="mm" class="${boqU()==='mm'?'on':''}">mm</button></div><span class="muted" title="ขนาดตัวอักษรและเส้นบนแบบ">ขนาดป้าย</span><input type="range" id="tkLbl" min="0.4" max="3" step="0.1" value="${+P.opts.tkLbl||1}" style="width:80px"></div>
-    ${all.length?`<div class="tkbar" style="padding-top:0">${opt('item','รายการ')}${opt('floor','ชั้น')}${opt('zone','โซน')}</div>`:''}`;
-  el.innerHTML=head+(all.length?`<table class="tkt"><thead><tr><th>No.</th><th>รายการ / รายละเอียด</th><th style="text-align:right">รวม</th></tr></thead><tbody>${ms.map(m=>{const t=tkCalc(m),K=KIND[m.kind||'line'];return`<tr data-mid="${m.id}" style="cursor:pointer"><td><span class="sw2" style="background:${m.color}"></span><b>L${m.no||'?'}</b><div class="muted" style="font-size:11px">${K.ic} ${K.t}</div></td><td class="u"><div style="font-weight:600">${esc(m.item||'—')}${m.psize?` <span class="muted">${esc(m.psize)}</span>`:''}</div><div class="muted" style="font-size:12px">${esc([m.wtype,[m.floor,m.zone].filter(Boolean).join(' '),m.note].filter(Boolean).join(' · '))}${(m.drops||[]).length?` · ⭕${m.drops.length}`:''}${(+m.mult||1)>1?` · ×${m.mult}`:''}${+m.waste?` · +${m.waste}%`:''}</div></td><td class="n"><b>${t?fmtQ(t.total,t.unit):'-'}</b><br><button class="ibtn tkdel" data-del="${m.id}" title="ลบ" style="width:26px;height:26px;margin-top:2px">🗑</button></td></tr>`}).join('')}</tbody></table>
-    <table class="tkt" style="margin-top:10px"><thead><tr><th>สรุปตามรายการ</th><th style="text-align:right">n</th><th style="text-align:right">รวม</th></tr></thead><tbody>${g.map(o=>`<tr><td class="u"><span class="sw2" style="background:${o.color||'#3949ab'}"></span>${esc(o.item)}${o.psize?' '+esc(o.psize):''}</td><td class="n">${o.n}</td><td class="n"><b>${fmtQ(o.total,o.unit)}</b>${o.price?`<div class="muted" style="font-size:11px">${o.amount.toLocaleString('en-US',{maximumFractionDigits:2})} ฿</div>`:''}</td></tr>`).join('')}${Object.entries(unitTotals(g)).map(([u,v])=>`<tr class="tot"><td>รวม (${uLbl(u)})</td><td></td><td class="n">${fmtQ(v,u)}</td></tr>`).join('')}${g.some(o=>o.price)?`<tr class="tot"><td>มูลค่ารวม</td><td></td><td class="n">${g.reduce((t,o)=>t+o.amount,0).toLocaleString('en-US',{maximumFractionDigits:2})} ฿</td></tr>`:''}</tbody></table>`
-    :`<div class="muted" style="padding:12px 10px">เลือกเครื่องมือในกลุ่มถอดปริมาณ: <b>📏 ความยาว</b> (Polyline/Spline) · <b>▱ พื้นที่</b> · <b>🔢 นับจำนวน</b> แล้วกด ✓ จบ และกรอกรายละเอียด · ได้เลข L1, L2, … อัตโนมัติ</div>`);
+    ${all.length?`<div class="tkbar" style="padding-top:0">${opt('item','รายการ')}${opt('floor','ชั้น')}${opt('zone','โซน')}</div>`:''}${(()=>{const F=frameSum();return F.cnt?`<div class="frsum"><div>▭ รวมความยาววงกบท่อลม<span>${F.cnt} ตำแหน่ง · ${F.n} ชุด</span></div><b>${fmtQ(F.len,'m')}</b></div>`:''})()}`;
+  el.innerHTML=head+(all.length?`<table class="tkt"><thead><tr><th>No.</th><th>รายการ / รายละเอียด</th><th style="text-align:right">รวม</th></tr></thead><tbody>${ms.map(m=>{const t=tkCalc(m),K=KIND[m.kind||'line'];return`<tr data-mid="${m.id}" style="cursor:pointer"><td><span class="sw2" style="background:${m.color}"></span><b>L${m.no||'?'}</b><div class="muted" style="font-size:11px">${K.ic} ${K.t}</div></td><td class="u"><div style="font-weight:600">${esc(m.item||'—')}${m.psize?` <span class="muted">${esc(m.psize)}</span>`:''}</div><div class="muted" style="font-size:12px">${esc([m.wtype,[m.floor,m.zone].filter(Boolean).join(' '),tkNote(m)].filter(Boolean).join(' · '))}${(m.drops||[]).length?` · ⭕${m.drops.length}`:''}${(+m.mult||1)>1?` · ×${m.mult}`:''}${+m.waste?` · +${m.waste}%`:''}</div></td><td class="n"><b>${t?fmtQ(t.total,t.unit):'-'}</b><br><button class="ibtn tkdel" data-del="${m.id}" title="ลบ" style="width:26px;height:26px;margin-top:2px">🗑</button></td></tr>`}).join('')}</tbody></table>
+    <table class="tkt" style="margin-top:10px"><thead><tr><th>สรุปตามรายการ</th><th style="text-align:right">n</th><th style="text-align:right">รวม</th></tr></thead><tbody>${g.map(o=>`<tr><td class="u"><span class="sw2" style="background:${o.color||'#3949ab'}"></span>${esc(o.item)}${o.psize?' '+esc(o.psize):''}</td><td class="n">${o.n}</td><td class="n"><b>${fmtQ(o.total,o.unit)}</b>${o.price?`<div class="muted" style="font-size:11px">${o.amount.toLocaleString('en-US',{maximumFractionDigits:2})} ฿</div>`:''}</td></tr>`).join('')}${(()=>{const F=frameSum();return F.cnt?`<tr class="tot frs"><td>▭ รวมความยาววงกบท่อลม</td><td class="n">${F.n}</td><td class="n">${fmtQ(F.len,'m')}</td></tr>`:''})()}${Object.entries(unitTotals(g)).map(([u,v])=>`<tr class="tot"><td>รวม (${uLbl(u)})</td><td></td><td class="n">${fmtQ(v,u)}</td></tr>`).join('')}${g.some(o=>o.price)?`<tr class="tot"><td>มูลค่ารวม</td><td></td><td class="n">${g.reduce((t,o)=>t+o.amount,0).toLocaleString('en-US',{maximumFractionDigits:2})} ฿</td></tr>`:''}</tbody></table>`
+    :`<div class="muted" style="padding:12px 10px">เลือกเครื่องมือในกลุ่มถอดปริมาณ: <b>📏 ความยาว</b> (Polyline/Spline) · <b>▱ พื้นที่</b> · <b>🔢 นับจำนวน</b> · <b>▭ วงกบท่อลม</b> (แตะจุด + ขนาดท่อ กว้าง×สูง) แล้วกด ✓ จบ และกรอกรายละเอียด · ได้เลข L1, L2, … อัตโนมัติ</div>`);
   el.querySelector('#tkUnit').onclick=e=>{const b=e.target.closest('[data-u]');if(!b)return;P.opts.boqUnit=b.dataset.u;save();renderTk();renderMarks()};
   el.querySelector('#tkLbl').oninput=e=>{P.opts.tkLbl=+e.target.value;renderMarks()};el.querySelector('#tkLbl').onchange=()=>save();
   el.querySelectorAll('.tkf').forEach(s=>s.onchange=()=>{TKF[s.dataset.k]=s.value;renderTk();renderMarks()});
@@ -2763,8 +2799,8 @@ function renderTk(){const el=$('#tkList');if(!el)return;const g=tkGroups(),all=t
   if(document.querySelector('.cardc.tkc.fs'))renderTkBig();
 }
 function renderTkBig(){const el=$('#tkBigTab');if(!el)return;const ms=tkMarks().filter(tkVisible).map(m=>({m,t:tkCalc(m)}));const g=tkGroups(),fg=tkFloorGroups();
-  el.innerHTML=`<h4 style="margin:6px 0">ส่วนที่ 1 : รายละเอียด <span class="muted" style="font-weight:400">— แตะแถวเพื่อแก้ไข</span></h4><div style="overflow:auto"><table class="tkt" style="min-width:1400px"><thead><tr><th>No.</th><th>ชนิด</th><th>ประเภทงาน</th><th>รายการ</th><th>ขนาด</th><th>รายละเอียด</th><th>ชั้น</th><th>โซน</th><th>แบบ</th><th style="text-align:right">ปริมาณ</th><th style="text-align:right">แนวดิ่ง</th><th style="text-align:right">×</th><th style="text-align:right">เผื่อ%</th><th style="text-align:right">รวม</th><th>ผู้ถอด</th><th>วันที่ - เวลา</th></tr></thead><tbody>${ms.map(({m,t})=>`<tr data-mid="${m.id}" style="cursor:pointer"><td><span class="sw2" style="background:${m.color}"></span><b>L${m.no||'?'}</b></td><td>${KIND[m.kind||'line'].ic} ${KIND[m.kind||'line'].t}</td><td class="u">${esc(m.wtype||'')}</td><td class="u">${esc(m.item||'-')}</td><td class="u">${esc(m.psize||'')}</td><td class="u">${esc(m.note||'')}</td><td class="u">${esc(m.floor||'')}</td><td class="u">${esc(m.zone||'')}</td><td class="u">${esc(dwgName(m.drawingId))}</td><td class="n">${t?fmtQ(t.plan,t.unit):'-'}</td><td class="n">${t&&t.nDrop?t.nDrop+' / '+fmtM(t.vert):'-'}</td><td class="n">${t?t.mult:1}</td><td class="n">${+m.waste||0}</td><td class="n"><b>${t?fmtQ(t.total,t.unit):'-'}</b></td><td class="u">${esc(m.by||'')}</td><td>${fmtTS(m.at)}</td></tr>`).join('')}</tbody></table></div>
-  <h4 style="margin:16px 0 6px">ส่วนที่ 2 : สรุปตามรายการ <span class="muted" style="font-weight:400">— ใส่ราคาต่อหน่วยได้ในตาราง</span></h4><table class="tkt"><thead><tr><th>รายการ</th><th>ขนาด</th><th>ประเภทงาน</th><th style="text-align:right">n</th><th style="text-align:right">รวม</th><th style="text-align:right">ราคา/หน่วย (฿)</th><th style="text-align:right">จำนวนเงิน (฿)</th></tr></thead><tbody>${g.map(o=>`<tr><td class="u"><span class="sw2" style="background:${o.color||'#3949ab'}"></span>${esc(o.item)}</td><td class="u">${esc(o.psize)}</td><td class="u">${esc(o.wtype)}</td><td class="n">${o.n}</td><td class="n"><b>${fmtQ(o.total,o.unit)}</b></td><td class="n"><input class="in tkpr" data-pk="${esc(priceKey(o))}" type="number" min="0" step="0.01" value="${o.price||''}" style="width:110px;text-align:right" placeholder="0"></td><td class="n">${o.amount?o.amount.toLocaleString('en-US',{maximumFractionDigits:2}):'-'}</td></tr>`).join('')}${Object.entries(unitTotals(g)).map(([u,v])=>`<tr class="tot"><td colspan="4">รวม (${uLbl(u)})</td><td class="n">${fmtQ(v,u)}</td><td></td><td></td></tr>`).join('')}<tr class="tot"><td colspan="6">มูลค่ารวม</td><td class="n">${g.reduce((t,o)=>t+o.amount,0).toLocaleString('en-US',{maximumFractionDigits:2})}</td></tr></tbody></table>
+  el.innerHTML=`<h4 style="margin:6px 0">ส่วนที่ 1 : รายละเอียด <span class="muted" style="font-weight:400">— แตะแถวเพื่อแก้ไข</span></h4><div style="overflow:auto"><table class="tkt" style="min-width:1400px"><thead><tr><th>No.</th><th>ชนิด</th><th>ประเภทงาน</th><th>รายการ</th><th>ขนาด</th><th>รายละเอียด</th><th>ชั้น</th><th>โซน</th><th>แบบ</th><th style="text-align:right">ปริมาณ</th><th style="text-align:right">แนวดิ่ง</th><th style="text-align:right">×</th><th style="text-align:right">เผื่อ%</th><th style="text-align:right">รวม</th><th>ผู้ถอด</th><th>วันที่ - เวลา</th></tr></thead><tbody>${ms.map(({m,t})=>`<tr data-mid="${m.id}" style="cursor:pointer"><td><span class="sw2" style="background:${m.color}"></span><b>L${m.no||'?'}</b></td><td>${KIND[m.kind||'line'].ic} ${KIND[m.kind||'line'].t}</td><td class="u">${esc(m.wtype||'')}</td><td class="u">${esc(m.item||'-')}</td><td class="u">${esc(m.psize||'')}</td><td class="u">${esc(tkNote(m))}</td><td class="u">${esc(m.floor||'')}</td><td class="u">${esc(m.zone||'')}</td><td class="u">${esc(dwgName(m.drawingId))}</td><td class="n">${t?fmtQ(t.plan,t.unit):'-'}</td><td class="n">${t&&t.nDrop?t.nDrop+' / '+fmtM(t.vert):'-'}</td><td class="n">${t?t.mult:1}</td><td class="n">${+m.waste||0}</td><td class="n"><b>${t?fmtQ(t.total,t.unit):'-'}</b></td><td class="u">${esc(m.by||'')}</td><td>${fmtTS(m.at)}</td></tr>`).join('')}</tbody></table></div>
+  <h4 style="margin:16px 0 6px">ส่วนที่ 2 : สรุปตามรายการ <span class="muted" style="font-weight:400">— ใส่ราคาต่อหน่วยได้ในตาราง</span></h4><table class="tkt"><thead><tr><th>รายการ</th><th>ขนาด</th><th>ประเภทงาน</th><th style="text-align:right">n</th><th style="text-align:right">รวม</th><th style="text-align:right">ราคา/หน่วย (฿)</th><th style="text-align:right">จำนวนเงิน (฿)</th></tr></thead><tbody>${g.map(o=>`<tr><td class="u"><span class="sw2" style="background:${o.color||'#3949ab'}"></span>${esc(o.item)}</td><td class="u">${esc(o.psize)}</td><td class="u">${esc(o.wtype)}</td><td class="n">${o.n}</td><td class="n"><b>${fmtQ(o.total,o.unit)}</b></td><td class="n"><input class="in tkpr" data-pk="${esc(priceKey(o))}" type="number" min="0" step="0.01" value="${o.price||''}" style="width:110px;text-align:right" placeholder="0"></td><td class="n">${o.amount?o.amount.toLocaleString('en-US',{maximumFractionDigits:2}):'-'}</td></tr>`).join('')}${Object.entries(unitTotals(g)).map(([u,v])=>`<tr class="tot"><td colspan="4">รวม (${uLbl(u)})</td><td class="n">${fmtQ(v,u)}</td><td></td><td></td></tr>`).join('')}${(()=>{const F=frameSum();return F.cnt?`<tr class="tot frs"><td colspan="4">▭ รวมความยาววงกบท่อลม (${F.n} ชุด)</td><td class="n">${fmtQ(F.len,'m')}</td><td></td><td></td></tr>`:''})()}<tr class="tot"><td colspan="6">มูลค่ารวม</td><td class="n">${g.reduce((t,o)=>t+o.amount,0).toLocaleString('en-US',{maximumFractionDigits:2})}</td></tr></tbody></table>
   <h4 style="margin:16px 0 6px">ส่วนที่ 3 : สรุปตามชั้น / โซน</h4><table class="tkt"><thead><tr><th>ชั้น</th><th>โซน</th><th>ประเภทงาน</th><th>รายการ</th><th>ขนาด</th><th style="text-align:right">n</th><th style="text-align:right">รวม</th></tr></thead><tbody>${fg.map(o=>`<tr><td class="u">${esc(o.floor)}</td><td class="u">${esc(o.zone)}</td><td class="u">${esc(o.wtype)}</td><td class="u">${esc(o.item)}</td><td class="u">${esc(o.psize)}</td><td class="n">${o.n}</td><td class="n"><b>${fmtQ(o.total,o.unit)}</b></td></tr>`).join('')}</tbody></table>`;
   el.querySelectorAll('.tkpr').forEach(i=>{i.onclick=e=>e.stopPropagation();i.onchange=()=>{P.opts.prices=P.opts.prices||{};const v=parseFloat(i.value);if(v>0)P.opts.prices[i.dataset.pk]=v;else delete P.opts.prices[i.dataset.pk];save();renderTk();renderTkBig()}})}
 function fmtTS(iso){if(!iso)return'';const d=new Date(iso);if(isNaN(d))return'';const p=n=>String(n).padStart(2,'0');return`${p(d.getDate())}/${p(d.getMonth()+1)}/${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`}
@@ -2790,7 +2826,7 @@ function addTakeoffSheet(wb){const ms=tkMarks();if(!ms.length)return false;const
   const hd=['No.','ชนิด','ประเภทงาน','รายการ','ขนาด','รายละเอียด','ชั้น','โซน','แบบ','ปริมาณ','แนวดิ่ง','จุดดิ่ง','ตัวคูณ','เผื่อ %','หน่วย','รวม','ผู้ถอด / วันที่-เวลา','หมายเหตุ / จุดแนวดิ่ง'];
   hd.forEach((t,c)=>put(r,c+1,t,{bold:true},'center',true));ws.getRow(r).height=36;const d0=r;r++;
   ms.forEach(m=>{const t=tkCalc(m)||{kind:'line',unit:'m',plan:0,vert:0,mult:1,waste:0,total:0,nDrop:0};const dn=(m.drops||[]).map((x,j)=>`⭕${j+1} ${x.label?x.label+' ':''}${uv(+x.len)} ${U}`).join(', ');
-    const v=['L'+(m.no||'?'),KIND[t.kind].t,m.wtype||'',m.item||'-',m.psize||'',m.note||'',m.floor||'',m.zone||'',dwgName(m.drawingId),uvQ(t.plan,t.unit),t.unit==='m'?uv(t.vert):0,t.nDrop,t.mult,t.waste,uLbl(t.unit),null,[m.by,fmtTS(m.at)].filter(Boolean).join(' · '),dn];
+    const v=['L'+(m.no||'?'),KIND[t.kind].t,m.wtype||'',m.item||'-',m.psize||'',tkNote(m),m.floor||'',m.zone||'',dwgName(m.drawingId),uvQ(t.plan,t.unit),t.unit==='m'?uv(t.vert):0,t.nDrop,t.mult,t.waste,uLbl(t.unit),null,[m.by,fmtTS(m.at)].filter(Boolean).join(' · '),dn];
     v.forEach((x,c)=>put(r,c+1,x,c===0?{bold:true}:{},[2,3,4,5,8,16,17].includes(c)?'left':'center',[3,5,16,17].includes(c)));
     const f=`(J${r}+K${r})*M${r}*(1+N${r}/100)`;const tc=ws.getCell(r,16);tc.value={formula:t.unit==='EA'?`ROUNDUP(${f},0)`:f,result:uvQ(t.total,t.unit)};tc.font=F({bold:true});tc.alignment={horizontal:'center',vertical:'middle'};
     [10,11,16].forEach(c=>ws.getCell(r,c).numFmt=nfOf(t.unit));ws.getRow(r).height=28;r++});
@@ -2802,6 +2838,7 @@ function addTakeoffSheet(wb){const ms=tkMarks();if(!ms.length)return false;const
   g.forEach((o,i)=>{row([i+1,o.wtype,o.item,o.psize,o.cat,o.n,uvQ(o.total,o.unit),uLbl(o.unit),o.price||'',null]);ws.getCell(r-1,11).numFmt=nfOf(o.unit);ws.getCell(r-1,11).font=F({bold:true});
     const ac=ws.getCell(r-1,17);ac.value={formula:`IF(P${r-1}="",0,K${r-1}*P${r-1})`,result:o.amount};ac.numFmt='#,##0.00';ac.font=F();ac.alignment={horizontal:'center',vertical:'middle'};ws.getCell(r-1,16).numFmt='#,##0.00'});
   Object.entries(unitTotals(g)).forEach(([u,v])=>{ws.mergeCells(r,1,r,10);put(r,1,`รวม (${uLbl(u)})`,{bold:true},'right');ws.mergeCells(r,11,r,13);put(r,11,uvQ(v,u),{bold:true},'center');ws.getCell(r,11).numFmt=nfOf(u);ws.mergeCells(r,14,r,18);ws.getRow(r).height=26;r++});
+  {const F=frameSum();if(F.cnt){ws.mergeCells(r,1,r,10);put(r,1,`รวมความยาววงกบท่อลม (${F.n} ชุด) (${uLbl('m')})`,{bold:true},'right');ws.mergeCells(r,11,r,13);put(r,11,uvQ(F.len,'m'),{bold:true},'center');ws.getCell(r,11).numFmt=nfOf('m');ws.mergeCells(r,14,r,18);ws.getRow(r).height=26;r++}}
   ws.mergeCells(r,1,r,16);put(r,1,'มูลค่ารวม (บาท)',{bold:true},'right');ws.mergeCells(r,17,r,18);const at=ws.getCell(r,17);at.value={formula:`SUM(Q${s0+1}:Q${s0+g.length})`,result:g.reduce((t,o)=>t+o.amount,0)};at.font=F({bold:true});at.numFmt='#,##0.00';at.alignment={horizontal:'center',vertical:'middle'};ws.getRow(r).height=26;
   border(s0,1,r,NC);outline(s0,1,r,NC);box(ws,s0,1,s0,NC,'medium');box(ws,r,1,r,NC,'medium');r+=2;
   sec(r,'ส่วนที่ 3 : สรุปตามชั้น / โซน');r++;const f0=r;const fg=tkFloorGroups();
@@ -2822,7 +2859,7 @@ async function exportTakeoffXlsx(){if(!tkMarks().length){toast('ยังไม�
 async function exportTakeoffCsv(){const ms=tkMarks();if(!ms.length){toast('ยังไม่มีรายการถอดปริมาณ');return}const U=boqU();
   const q=v=>{v=String(v??'');return/[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
   const rows=[['Line','Kind','WorkType','Item','Size','Detail','Floor','Zone','Drawing','Quantity','Vertical','Multiplier','Waste%','Total','Unit','By','DateTime']];
-  ms.forEach(m=>{const t=tkCalc(m);if(!t)return;rows.push(['L'+(m.no||''),t.kind,m.wtype||'',m.item||'',m.psize||'',m.note||'',m.floor||'',m.zone||'',dwgName(m.drawingId),uvQ(t.plan,t.unit),t.unit==='m'?uv(t.vert):0,t.mult,t.waste,uvQ(t.total,t.unit),uLbl(t.unit),m.by||'',fmtTS(m.at)])});
+  ms.forEach(m=>{const t=tkCalc(m);if(!t)return;rows.push(['L'+(m.no||''),t.kind,m.wtype||'',m.item||'',m.psize||'',tkNote(m),m.floor||'',m.zone||'',dwgName(m.drawingId),uvQ(t.plan,t.unit),t.unit==='m'?uv(t.vert):0,t.mult,t.waste,uvQ(t.total,t.unit),uLbl(t.unit),m.by||'',fmtTS(m.at)])});
   await saveFile(`${P.name}_Backup-BOQ_${today()}.csv`,new Blob(['﻿'+rows.map(r=>r.map(q).join(',')).join('\r\n')],{type:'text/csv;charset=utf-8'}))}
 /* ---- PDF Backup-BOQ (formal: black on white) ---- */
 function boqTablePage(sections,i,N,logo,opts={}){
@@ -2863,11 +2900,11 @@ async function exportBoqPdf(){const ms=tkMarks();if(!ms.length){toast('ยัง
   try{await loadRFont();busy(true);OVMODE='boq';let doc=null;const newPage=(f,o)=>{if(!doc)doc=new jsPDF({unit:'mm',format:f,orientation:o,compress:true});else doc.addPage(f,o);return doc};
     const logo=P.header.logo?await loadImg(P.header.logo):null;const dws=P.drawings.filter(d=>ms.some(m=>m.drawingId===d.id));
     const dc=[{t:'No.',w:5,a:'center',b:1},{t:'ประเภทงาน',w:10},{t:'รายการ',w:14},{t:'ขนาด',w:7},{t:'รายละเอียด',w:13},{t:'ชั้น',w:6,a:'center'},{t:'โซน',w:6,a:'center'},{t:'ปริมาณ',w:9,a:'right'},{t:'แนวดิ่ง',w:9,a:'right'},{t:'×',w:3,a:'center'},{t:'เผื่อ%',w:5,a:'center'},{t:'รวม',w:10,a:'right',b:1},{t:'ผู้ถอด',w:8},{t:'วันที่ - เวลา',w:10,a:'center'}];
-    const det=ms.map(m=>{const t=tkCalc(m)||{unit:'m',plan:0,vert:0,mult:1,waste:0,total:0,nDrop:0};return{v:['L'+(m.no||'?'),m.wtype||'',m.item||'-',m.psize||'',m.note||'',m.floor||'',m.zone||'',fmtQ(t.plan,t.unit),t.nDrop?`${t.nDrop} / ${fmtM(t.vert)}`:'-',t.mult,t.waste||0,fmtQ(t.total,t.unit),m.by||'',fmtTS(m.at)]}});
+    const det=ms.map(m=>{const t=tkCalc(m)||{unit:'m',plan:0,vert:0,mult:1,waste:0,total:0,nDrop:0};return{v:['L'+(m.no||'?'),m.wtype||'',m.item||'-',m.psize||'',tkNote(m),m.floor||'',m.zone||'',fmtQ(t.plan,t.unit),t.nDrop?`${t.nDrop} / ${fmtM(t.vert)}`:'-',t.mult,t.waste||0,fmtQ(t.total,t.unit),m.by||'',fmtTS(m.at)]}});
     const g=tkGroups(),hasP=g.some(o=>o.price);const sc=[{t:'No.',w:4,a:'center'},{t:'รายการ',w:20},{t:'ขนาด',w:8},{t:'ประเภทงาน',w:12},{t:'n',w:5,a:'center'},{t:'รวม',w:12,a:'right',b:1},{t:'ราคา/หน่วย',w:10,a:'right'},{t:'จำนวนเงิน (฿)',w:12,a:'right',b:1}];
     const fmtB=v=>v?(+v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'-';
     const sum=g.map((o,i)=>({v:[i+1,o.item,o.psize,o.wtype,o.n,fmtQ(o.total,o.unit),fmtB(o.price),fmtB(o.amount)]}));
-    Object.entries(unitTotals(g)).forEach(([u,v])=>sum.push({tot:1,v:['',`รวม (${uLbl(u)})`,'','','',fmtQ(v,u),'','']}));if(hasP)sum.push({tot:1,v:['','มูลค่ารวม','','','','','',fmtB(g.reduce((t,o)=>t+o.amount,0))]});
+    Object.entries(unitTotals(g)).forEach(([u,v])=>sum.push({tot:1,v:['',`รวม (${uLbl(u)})`,'','','',fmtQ(v,u),'','']}));{const F=frameSum();if(F.cnt)sum.push({tot:1,v:['',`รวมความยาววงกบท่อลม (${F.n} ชุด)`,'','','',fmtQ(F.len,'m'),'','']})}if(hasP)sum.push({tot:1,v:['','มูลค่ารวม','','','','','',fmtB(g.reduce((t,o)=>t+o.amount,0))]});
     const fc=[{t:'No.',w:4,a:'center'},{t:'ชั้น',w:8,a:'center'},{t:'โซน',w:8,a:'center'},{t:'ประเภทงาน',w:13},{t:'รายการ',w:20},{t:'ขนาด',w:8},{t:'n',w:5,a:'center'},{t:'รวม',w:12,a:'right',b:1}];
     const fl=tkFloorGroups().map((o,i)=>({v:[i+1,o.floor,o.zone,o.wtype,o.item,o.psize,o.n,fmtQ(o.total,o.unit)]}));
     const pages=[];paginate(det,24,26).forEach((rows,k)=>pages.push([{title:k?'ส่วนที่ 1 : รายละเอียด (ต่อ)':'ส่วนที่ 1 : รายละเอียด',cols:dc,rows}]));
@@ -2970,6 +3007,12 @@ function editDrop(m,i){const dp=m.drops[i];if(!dp)return;
 (()=>{const f=$('#scFold');const ap=on=>{document.body.classList.toggle('sc-fold',on);f.textContent=on?'▾':'▴';f.title=on?'ขยาย':'ย่อ';setTimeout(()=>{if(curDwg())applyT()},60)};
  let v=false;try{v=localStorage.getItem('drawnote-scfold')==='1'}catch(e){}ap(v);
  f.onclick=()=>{const on=!document.body.classList.contains('sc-fold');try{localStorage.setItem('drawnote-scfold',on?'1':'0')}catch(e){}ap(on)}})();
+
+(()=>{const seg=$('#wsSeg'),pos=$('#wsPos'),bar=$('#gbar'),st=$('#stage');
+ seg.addEventListener('pointerdown',e=>e.stopPropagation());seg.addEventListener('wheel',e=>e.stopPropagation(),{passive:true});
+ const ap=left=>{if(left){st.appendChild(seg);pos.textContent='⤒';pos.title='ย้ายไปไว้บนแถบเครื่องมือ'}else{bar.insertBefore(seg,bar.firstChild);pos.textContent='⇤';pos.title='ย้ายไปไว้ด้านซ้ายของแบบ'}};
+ let v='left';try{v=localStorage.getItem('drawnote-wspos')||'left'}catch(e){}ap(v==='left');
+ pos.onclick=e=>{e.stopPropagation();const left=seg.parentNode!==st;try{localStorage.setItem('drawnote-wspos',left?'left':'top')}catch(_){}ap(left);toast(left?'ย้ายแถบ Site Report / Backup-BOQ ไปด้านซ้ายแล้ว':'ย้ายแถบไปบนแถบเครื่องมือแล้ว')}})();
 </script>
 <script>if('serviceWorker' in navigator&&/^https?:/.test(location.protocol)){navigator.serviceWorker.register('./sw.js').catch(e=>console.warn('sw',e))}</script>
 <script>(async()=>{try{if(!/^https?:/.test(location.protocol))return;const l=document.querySelector('link[rel=manifest]');let ok=false;
